@@ -385,8 +385,8 @@ def sidebar():
     <aside class="sidebar">
       <div>
         <p class="eyebrow">AI Thực Chiến</p>
-        <h1>LABCODE Copilot</h1>
-        <p class="subtle">Trợ lý phân tích tài liệu LABCODE và điều phối công việc nhóm.</p>
+        <h1>Codelabs Tutor</h1>
+        <p class="subtle">Trợ lý phân tích tài liệu Codelabs và điều phối công việc nhóm.</p>
       </div>
       <nav class="steps" aria-label="Các bước">{''.join(buttons)}</nav>
     </aside>
@@ -762,7 +762,7 @@ def render_progress():
 
 def render_persistent_chat():
     if not STATE.get("git_link"):
-        return "<aside class='chat-sidebar' style='background:#fbfcfb; padding:20px;'><h3 style='color:var(--muted)'>AI Copilot</h3><p style='color:var(--muted); font-size:14px'>Hãy điền Link tài liệu ở bên trái để bắt đầu chat.</p></aside>"
+        return "<aside class='chat-sidebar' style='background:#fbfcfb; padding:20px;'><h3 style='color:var(--muted)'>Codelabs Tutor</h3><p style='color:var(--muted); font-size:14px'>Hãy điền Link tài liệu ở bên trái để bắt đầu chat.</p></aside>"
         
     history_json = json.dumps(STATE.get("chat_history", []))
     ctx = f"Git: {STATE.get('git_link', '')}\\nNội dung:\\n{STATE.get('doc', '')}"
@@ -771,7 +771,7 @@ def render_persistent_chat():
     return f'''
     <aside class="chat-sidebar" style="display:flex; flex-direction:column; background:#fff; height:100vh; border-left:1px solid var(--line);">
       <div style="padding: 20px; border-bottom: 1px solid var(--line); background:#f8faf8;">
-        <h3 style="margin:0; color:var(--green-dark);">AI Copilot</h3>
+        <h3 style="margin:0; color:var(--green-dark);">Codelabs Tutor</h3>
         <p style="margin:4px 0 0; font-size:12px; color:var(--muted);">Gõ chat để thay đổi Dashboard</p>
       </div>
       
@@ -812,8 +812,13 @@ def render_persistent_chat():
             let visible = history.filter(m => !m.content.startsWith("Tôi cần chia việc cho tài liệu Lab:"));
             visible.forEach(m => {{
                 let text = m.content;
-                if(text.includes("[FINAL_PLAN]")) text = text.split("[FINAL_PLAN]")[0];
-                if(!text.trim()) return;
+                let hasPlan = text.includes("[FINAL_PLAN]");
+                if(hasPlan) text = text.split("[FINAL_PLAN]")[0];
+                if(!text.trim() && hasPlan) {{
+                    text = "✅ Đã cập nhật xong Dashboard theo yêu cầu của bạn!";
+                }} else if(!text.trim()) {{
+                    return;
+                }}
                 appendMsgUI(m.role, text);
             }});
         }}
