@@ -52,8 +52,14 @@ Dựa vào thông tin trên, hãy trả về kết quả dưới định dạng 
 Lưu ý quan trọng:
 1. Hãy chia việc thành đúng {num_members} vai trò (roles). Mảng "roles" trong JSON trả về bắt buộc phải có CHÍNH XÁC đúng {num_members} phần tử.
 2. Với mỗi vai trò, các task cần có tên và mô tả rõ ràng.
-3. Trong trường 'tasks', nếu một task có đầu ra trao đổi dữ liệu với vai trò khác, hãy chỉ rõ định dạng Data Contract ở dạng JSON trong phần mô tả của task để tránh đứt gãy logic (ví dụ: "Đầu ra JSON contract: {{'status': string, 'results': list}}").
-4. Nếu tài liệu cung cấp thiếu thông tin cơ bản, hãy set "low_confidence": true.
+3. Trong trường 'tasks', mỗi mô tả task không chỉ ghi "làm gì", mà phải giải thích ngắn:
+   - Task này phục vụ mục tiêu lab nào.
+   - Input cần lấy từ vai trò/phần việc nào.
+   - Output sẽ đưa cho vai trò/phần việc nào.
+   - Người làm task này cần hiểu tối thiểu điều gì về phần của teammate.
+4. Nếu một task có đầu ra trao đổi dữ liệu với vai trò khác, hãy chỉ rõ định dạng Data Contract ở dạng JSON trong phần mô tả của task để tránh đứt gãy logic (ví dụ: "Đầu ra JSON contract: {{'status': string, 'results': list}}").
+5. Trong trường 'note', hãy tóm tắt vai trò này đóng góp gì vào bức tranh chung của lab và người làm vai trò này cần hiểu gì về các vai trò còn lại để demo/Q&A được.
+6. Nếu tài liệu cung cấp thiếu thông tin cơ bản, hãy set "low_confidence": true.
 """
     data = {
         "contents": [{"parts": [{"text": prompt}]}]
