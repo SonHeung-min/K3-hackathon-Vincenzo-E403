@@ -2,7 +2,18 @@ from html import escape
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import os
 import sys
+import json
+import urllib.request
+import time
+import datetime
+import ssl
 from urllib.parse import parse_qs
+
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 
 DEFAULT_GIT_LINK = "https://github.com/nhom-demo/labcode-cp2"
@@ -181,6 +192,100 @@ STYLE = """
 *{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,textarea,input{font:inherit}button{cursor:pointer}.app-shell{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}.sidebar{display:flex;flex-direction:column;gap:28px;padding:28px;color:#f7fbf7;background:#18201c}.sidebar h1,.topbar h2,.panel h3{margin:0;letter-spacing:0}.sidebar h1{margin-top:6px;font-size:32px;line-height:1.05}.subtle{color:#b6c6bb;line-height:1.55}.eyebrow{margin:0 0 8px;color:var(--green);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}.sidebar .eyebrow{color:#8cd6ad}.steps{display:grid;gap:10px}.step{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:12px;width:100%;padding:12px;color:#d8e5dc;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;text-align:left}.step span{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#17211b;background:#d9efdf;font-weight:800}.step.is-active{color:#fff;border-color:#8cd6ad;background:rgba(140,214,173,.18)}.checkpoint{margin-top:auto;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:8px}.checkpoint ul{margin:0;padding-left:18px;line-height:1.7;color:#d8e5dc}.workspace{padding:28px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.topbar h2{font-size:clamp(26px,4vw,42px)}.status-pill{min-width:112px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--green-dark);background:#edf7ef;text-align:center;font-weight:750}.panel{padding:22px;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.wide{grid-column:1/-1}.upload-panel{display:grid;gap:16px}.textarea-label{font-weight:750}textarea{min-height:280px;resize:vertical;width:100%;padding:16px;border:1px solid var(--line);border-radius:8px;color:#253029;background:#fbfcfb;line-height:1.55}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.primary,.ghost{min-height:42px;padding:0 16px;border-radius:8px;font-weight:800}.primary{color:#fff;background:var(--green);border:1px solid var(--green)}.ghost{color:var(--ink);background:transparent;border:1px solid var(--line)}ul,ol{line-height:1.65}.deliverables,.roles-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.deliverable,.role-card{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8faf8}.deliverable strong{display:block;margin-bottom:8px}.role-card{display:grid;gap:12px}.role-card label{color:var(--muted);font-size:13px;font-weight:700}.role-card input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px}.role-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.progress-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px}.role-tabs{display:grid;align-content:start;gap:10px}.role-tab{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#f8faf8;text-align:left}.role-tab.is-active{border-color:var(--green);background:#edf7ef}.task-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.progress-ring{display:grid;place-items:center;width:70px;height:70px;border:8px solid #d9eadd;border-top-color:var(--green);border-radius:50%;color:var(--green-dark);font-weight:850}.task-list{display:grid;gap:12px}.task-item{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:8px;background:#fbfcfb}.task-item input{width:18px;height:18px;margin-top:3px}.task-item strong{display:block;margin-bottom:4px}.task-item p{margin:0;color:var(--muted);line-height:1.5}.source-box,.ai-note{margin-top:16px;padding:16px;border-radius:8px;line-height:1.55}.source-box{border:1px solid #d6e1ef;background:#f2f7ff}.ai-note{border:1px solid #ead8bd;color:#6d4614;background:#fff8ed}@media(max-width:920px){.app-shell{grid-template-columns:1fr}.sidebar{min-height:auto}.grid,.roles-grid,.progress-layout,.deliverables{grid-template-columns:1fr}.topbar,.role-toolbar,.task-head{align-items:flex-start;flex-direction:column}}
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:8px}.field label{font-weight:750}.link-input,.edit-input,.mini-textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;color:#253029;background:#fbfcfb}.mini-textarea{min-height:74px}.link-preview{display:grid;gap:8px;margin-top:12px;color:var(--muted);font-size:14px}.summary-stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8faf8}.stat strong{display:block;font-size:24px;color:var(--green-dark)}.role-output{padding:12px;border:1px solid #d6e1ef;border-radius:8px;background:#f2f7ff;color:#24415f}.task-edit{display:grid;gap:8px}.task-edit label{color:var(--muted);font-size:13px;font-weight:700}@media(max-width:920px){.field-grid,.summary-stat{grid-template-columns:1fr}}
 """
+
+
+def call_ai_api(git_link, lab_link, doc_content):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return None, "Lỗi: Không tìm thấy biến môi trường GEMINI_API_KEY."
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    
+    prompt = f"""
+Bạn là một trợ lý ảo LABCODE Copilot chuyên nghiệp.
+Nhiệm vụ của bạn là đọc nội dung tài liệu hướng dẫn lab và link git của nhóm để phân tích, tổng hợp và chia việc.
+
+Dữ liệu đầu vào:
+Link Git: {git_link}
+Link Lab: {lab_link}
+Nội dung lab:
+{doc_content}
+
+Dựa vào thông tin trên, hãy trả về kết quả dưới định dạng JSON với cấu trúc CHÍNH XÁC như sau (không thêm markdown code block, chỉ xuất JSON thuần tuý):
+{{
+  "analysis": {{
+    "summary": ["Câu 1", "Câu 2", "Câu 3"],
+    "timeline": ["Bước 1", "Bước 2", "Bước 3"],
+    "deliverables": [
+      ["Tên đầu ra 1", "Mô tả ngắn 1"],
+      ["Tên đầu ra 2", "Mô tả ngắn 2"]
+    ]
+  }},
+  "roles": [
+    {{
+      "id": "pm",
+      "name": "Tên vai trò (VD: Product Lead)",
+      "focus": "Trọng tâm công việc",
+      "tasks": [
+        ["Tên task 1", "Mô tả chi tiết 1"],
+        ["Tên task 2", "Mô tả chi tiết 2"]
+      ],
+      "output": "Đầu ra cần nộp của vai trò này",
+      "source": "Trích dẫn nguồn từ tài liệu",
+      "note": "Ghi chú từ AI cho vai trò này"
+    }}
+  ],
+  "low_confidence": false
+}}
+
+Lưu ý:
+- Nếu tài liệu cung cấp thiếu thông tin cơ bản (không có yêu cầu đầu ra, không rõ số lượng thành viên), hãy set "low_confidence": true và giải thích trong "summary" và "roles" (gắn nhãn cần xác minh).
+- Cần tạo ít nhất 2 đến 3 role. Mỗi role có từ 2-3 task.
+"""
+    data = {
+        "contents": [{"parts": [{"text": prompt}]}]
+    }
+    
+    req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers={'Content-Type': 'application/json'})
+    
+    start_time = time.time()
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        
+        with urllib.request.urlopen(req, context=ctx) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            
+        elapsed = time.time() - start_time
+        
+        raw_text = result['candidates'][0]['content']['parts'][0]['text']
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        if raw_text.startswith("```"):
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+            
+        parsed_json = json.loads(raw_text.strip())
+        
+        os.makedirs(os.path.join("eval", "traces"), exist_ok=True)
+        trace_file = os.path.join("eval", "traces", f"trace_{int(time.time())}.json")
+        with open(trace_file, "w", encoding="utf-8") as f:
+            json.dump({
+                "timestamp": datetime.datetime.now().isoformat(),
+                "model": "gemini-1.5-flash",
+                "elapsed_seconds": elapsed,
+                "input_git": git_link,
+                "input_lab": lab_link,
+                "prompt": prompt,
+                "raw_response": result,
+                "parsed": parsed_json
+            }, f, ensure_ascii=False, indent=2)
+            
+        return parsed_json, None
+    except Exception as e:
+        return None, str(e)
 
 
 def active_analysis():
@@ -479,9 +584,39 @@ def handle_form(fields):
     if action == "analyze":
         STATE["git_link"] = fields.get("git_link", [STATE["git_link"]])[0].strip()
         STATE["lab_link"] = fields.get("lab_link", [STATE["lab_link"]])[0].strip()
-        missing_git = not STATE["git_link"] or "github.com" not in STATE["git_link"]
-        missing_lab = not STATE["lab_link"] or len(STATE["lab_link"]) < 12
-        STATE["low_confidence"] = missing_git or missing_lab or "thiếu" in STATE["lab_link"].lower()
+        parsed_ai, err = call_ai_api(STATE["git_link"], STATE["lab_link"], STATE["doc"])
+        
+        if err:
+            STATE["low_confidence"] = True
+            # fallback to mock risky
+        else:
+            global NORMAL_ANALYSIS, RISKY_ANALYSIS, ROLES
+            NORMAL_ANALYSIS = parsed_ai.get("analysis", NORMAL_ANALYSIS)
+            RISKY_ANALYSIS = NORMAL_ANALYSIS
+            ROLES = parsed_ai.get("roles", ROLES)
+            
+            for i, role in enumerate(ROLES):
+                role["member"] = f"Bạn {chr(65+i)}"
+            
+            STATE["low_confidence"] = parsed_ai.get("low_confidence", False)
+            STATE["members"] = {role["id"]: role.get("member", "Chưa gán") for role in ROLES}
+            STATE["role_tasks"] = {role["id"]: [task[0] if len(task) > 0 else "Task" for task in role.get("tasks", [])] for role in ROLES}
+            
+            # Cập nhật tasks vào trong ROLES luôn để giao diện render help_text đúng (tránh list index out of range)
+            for role in ROLES:
+                new_tasks = []
+                for t in role.get("tasks", []):
+                    if len(t) >= 2:
+                        new_tasks.append(t)
+                    elif len(t) == 1:
+                        new_tasks.append([t[0], ""])
+                    else:
+                        new_tasks.append(["Task", ""])
+                role["tasks"] = new_tasks
+                
+            STATE["role_outputs"] = {role["id"]: role.get("output", "") for role in ROLES}
+            STATE["active_role"] = ROLES[0]["id"] if ROLES else "pm"
+            STATE["done"] = {}
         STATE["step"] = "analysis"
     elif action == "load_risky":
         STATE["git_link"] = "https://github.com/nhom-demo/labcode-cp2"
