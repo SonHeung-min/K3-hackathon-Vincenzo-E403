@@ -11,7 +11,10 @@ from urllib.parse import parse_qs
 
 try:
     from dotenv import load_dotenv
-    load_dotenv()
+    import os
+    # When running from codebase/, .env is in the parent directory
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+    load_dotenv(dotenv_path=env_path)
 except ImportError:
     pass
 
@@ -94,90 +97,20 @@ RISKY_ANALYSIS = {
     ],
 }
 
-ROLES = [
-    {
-        "id": "pm",
-        "name": "Product Lead",
-        "member": "Bạn A",
-        "focus": "Lát cắt, ưu tiên, demo script",
-        "tasks": [
-            ("Chốt lát cắt một câu", "Viết rõ 1 user, 1 việc, 1 quyết định AI, 1 kết quả."),
-            ("Kiểm tra non-goals", "Loại các tính năng quá lớn như quản lý dự án đầy đủ."),
-            ("Chuẩn bị demo 5 phút", "Chọn 1 happy path và 1 case thiếu thông tin."),
-        ],
-        "output": "Lát cắt một câu, non-goals, demo script CP2.",
-        "source": "Guide §3.1, §3.2 và rubric R2/R5.",
-        "note": "AI gợi ý Product Lead vì vai này cần nối pain, prototype và demo thành một câu chuyện thống nhất.",
-    },
-    {
-        "id": "builder",
-        "name": "Prototype Builder",
-        "member": "Bạn B",
-        "focus": "UI bấm được và trạng thái của flow",
-        "tasks": [
-            ("Dựng flow 4 bước", "Nạp tài liệu, xem phân tích, chia vai trò, theo dõi tiến độ."),
-            ("Làm trạng thái low-confidence", "Khi tài liệu thiếu, hiện cảnh báo và câu hỏi cần bổ sung."),
-            ("Đảm bảo demo không cần can thiệp tay", "Tất cả màn hình chuyển bằng nút bấm."),
-        ],
-        "output": "Prototype Python mock chạy được và bấm hết flow.",
-        "source": "Guide §3.1: CP2 flow chính bấm đi hết được.",
-        "note": "AI chưa cần thật ở CP2; lời gọi AI thật sẽ nối vào nút Phân tích tài liệu ở CP3.",
-    },
-    {
-        "id": "prompt",
-        "name": "Prompt & Eval",
-        "member": "Bạn C",
-        "focus": "Prompt phân tích tài liệu và golden set",
-        "tasks": [
-            ("Viết prompt đầu tiên", "Bắt AI trả JSON gồm mục tiêu, đầu việc, đầu ra, vai trò, citations."),
-            ("Tạo 20 case golden set", "Có case thường, case khó, case thiếu thông tin và ngoài phạm vi."),
-            ("Định nghĩa quality bar", "Ví dụ đạt khi 80% case pass và 100% case không có căn cứ không bị đoán liều."),
-        ],
-        "output": "Prompt nháp, cấu trúc JSON, golden set bản đầu.",
-        "source": "Guide §2.6 và rubric R4.",
-        "note": "Đây là người sẽ biến mock CP2 thành AI thật CP3.",
-    },
-    {
-        "id": "evidence",
-        "name": "Evidence Lead",
-        "member": "Bạn D",
-        "focus": "Bằng chứng pain và validation",
-        "tasks": [
-            ("Khảo sát 20 học viên", "Hỏi lần gần nhất đọc tài liệu LABCODE mất bao lâu và kẹt ở đâu."),
-            ("Giữ quote nguyên văn", "Lưu câu hỏi, câu trả lời, tên/vai trò người trả lời."),
-            ("Chuẩn bị 5 user test", "Đặt lịch test 10 phút cho CP5."),
-        ],
-        "output": "Log khảo sát/mining, quote nguyên văn, danh sách user test.",
-        "source": "Guide §1.3 và §4.2.",
-        "note": "Không có bằng chứng thì slide và spec sẽ yếu, dù prototype bấm rất mượt.",
-    },
-    {
-        "id": "spec",
-        "name": "Spec Owner",
-        "member": "Bạn E",
-        "focus": "Spec, rủi ro, changelog",
-        "tasks": [
-            ("Lập 8 kịch bản rủi ro", "Phủ 4 lớp: nguồn sự thật, mơ hồ, ngoài phạm vi, domain."),
-            ("Gắn HAX/PAIR vào prototype", "Mỗi nguyên tắc phải trỏ được vào một chỗ cụ thể trong UI."),
-            ("Cập nhật changelog", "Mỗi thay đổi sau feedback cần có lý do."),
-        ],
-        "output": "Spec.md bản nháp có rủi ro, HAX/PAIR, quality bar.",
-        "source": "Template spec §4-§9 và guide §2.5.",
-        "note": "Vai này giúp nhóm không chỉ có màn hình, mà có chuỗi quyết định để được chấm điểm.",
-    },
-]
+ROLES = []
 
 STATE = {
     "step": "upload",
+    "chat_history": [],
     "git_link": DEFAULT_GIT_LINK,
-    "lab_link": DEFAULT_LAB_LINK,
     "doc": SAMPLE_DOC,
     "low_confidence": False,
-    "members": {role["id"]: role["member"] for role in ROLES},
-    "role_tasks": {role["id"]: [task for task, _ in role["tasks"]] for role in ROLES},
-    "role_outputs": {role["id"]: role["output"] for role in ROLES},
-    "active_role": "pm",
-    "done": {"pm": {"0"}},
+    "members": {},
+    "role_tasks": {},
+    "role_outputs": {},
+    "active_role": "",
+    "done": {},
+    "upload_status": "idle"
 }
 
 STEPS = [
@@ -189,98 +122,228 @@ STEPS = [
 
 STYLE = """
 :root{--bg:#f5f7f4;--ink:#18201c;--muted:#647067;--panel:#fff;--line:#d9e1d9;--green:#2f7d52;--green-dark:#215b3d;--amber:#c77918;--shadow:0 16px 40px rgba(24,32,28,.08)}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,textarea,input{font:inherit}button{cursor:pointer}.app-shell{display:grid;grid-template-columns:320px minmax(0,1fr);min-height:100vh}.sidebar{display:flex;flex-direction:column;gap:28px;padding:28px;color:#f7fbf7;background:#18201c}.sidebar h1,.topbar h2,.panel h3{margin:0;letter-spacing:0}.sidebar h1{margin-top:6px;font-size:32px;line-height:1.05}.subtle{color:#b6c6bb;line-height:1.55}.eyebrow{margin:0 0 8px;color:var(--green);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}.sidebar .eyebrow{color:#8cd6ad}.steps{display:grid;gap:10px}.step{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:12px;width:100%;padding:12px;color:#d8e5dc;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;text-align:left}.step span{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#17211b;background:#d9efdf;font-weight:800}.step.is-active{color:#fff;border-color:#8cd6ad;background:rgba(140,214,173,.18)}.checkpoint{margin-top:auto;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:8px}.checkpoint ul{margin:0;padding-left:18px;line-height:1.7;color:#d8e5dc}.workspace{padding:28px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.topbar h2{font-size:clamp(26px,4vw,42px)}.status-pill{min-width:112px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--green-dark);background:#edf7ef;text-align:center;font-weight:750}.panel{padding:22px;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.wide{grid-column:1/-1}.upload-panel{display:grid;gap:16px}.textarea-label{font-weight:750}textarea{min-height:280px;resize:vertical;width:100%;padding:16px;border:1px solid var(--line);border-radius:8px;color:#253029;background:#fbfcfb;line-height:1.55}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.primary,.ghost{min-height:42px;padding:0 16px;border-radius:8px;font-weight:800}.primary{color:#fff;background:var(--green);border:1px solid var(--green)}.ghost{color:var(--ink);background:transparent;border:1px solid var(--line)}ul,ol{line-height:1.65}.deliverables,.roles-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.deliverable,.role-card{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8faf8}.deliverable strong{display:block;margin-bottom:8px}.role-card{display:grid;gap:12px}.role-card label{color:var(--muted);font-size:13px;font-weight:700}.role-card input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px}.role-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.progress-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px}.role-tabs{display:grid;align-content:start;gap:10px}.role-tab{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#f8faf8;text-align:left}.role-tab.is-active{border-color:var(--green);background:#edf7ef}.task-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.progress-ring{display:grid;place-items:center;width:70px;height:70px;border:8px solid #d9eadd;border-top-color:var(--green);border-radius:50%;color:var(--green-dark);font-weight:850}.task-list{display:grid;gap:12px}.task-item{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:8px;background:#fbfcfb}.task-item input{width:18px;height:18px;margin-top:3px}.task-item strong{display:block;margin-bottom:4px}.task-item p{margin:0;color:var(--muted);line-height:1.5}.source-box,.ai-note{margin-top:16px;padding:16px;border-radius:8px;line-height:1.55}.source-box{border:1px solid #d6e1ef;background:#f2f7ff}.ai-note{border:1px solid #ead8bd;color:#6d4614;background:#fff8ed}@media(max-width:920px){.app-shell{grid-template-columns:1fr}.sidebar{min-height:auto}.grid,.roles-grid,.progress-layout,.deliverables{grid-template-columns:1fr}.topbar,.role-toolbar,.task-head{align-items:flex-start;flex-direction:column}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,textarea,input{font:inherit}button{cursor:pointer}.app-shell{display:grid;grid-template-columns:250px minmax(0,1fr) 5px 350px;min-height:100vh}.sidebar{display:flex;flex-direction:column;gap:28px;padding:28px;color:#f7fbf7;background:#18201c}.sidebar h1,.topbar h2,.panel h3{margin:0;letter-spacing:0}.sidebar h1{margin-top:6px;font-size:32px;line-height:1.05}.subtle{color:#b6c6bb;line-height:1.55}.eyebrow{margin:0 0 8px;color:var(--green);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}.sidebar .eyebrow{color:#8cd6ad}.steps{display:grid;gap:10px}.step{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:12px;width:100%;padding:12px;color:#d8e5dc;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;text-align:left}.step span{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#17211b;background:#d9efdf;font-weight:800}.step.is-active{color:#fff;border-color:#8cd6ad;background:rgba(140,214,173,.18)}.checkpoint{margin-top:auto;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:8px}.checkpoint ul{margin:0;padding-left:18px;line-height:1.7;color:#d8e5dc}.workspace{padding:28px}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:22px}.topbar h2{font-size:clamp(26px,4vw,42px)}.status-pill{min-width:112px;padding:9px 14px;border:1px solid var(--line);border-radius:999px;color:var(--green-dark);background:#edf7ef;text-align:center;font-weight:750}.panel{padding:22px;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:var(--shadow)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.wide{grid-column:1/-1}.upload-panel{display:grid;gap:16px}.textarea-label{font-weight:750}textarea{min-height:280px;resize:vertical;width:100%;padding:16px;border:1px solid var(--line);border-radius:8px;color:#253029;background:#fbfcfb;line-height:1.55}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}.primary,.ghost{min-height:42px;padding:0 16px;border-radius:8px;font-weight:800}.primary{color:#fff;background:var(--green);border:1px solid var(--green)}.ghost{color:var(--ink);background:transparent;border:1px solid var(--line)}ul,ol{line-height:1.65}.deliverables,.roles-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.deliverable,.role-card{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8faf8}.deliverable strong{display:block;margin-bottom:8px}.role-card{display:grid;gap:12px}.role-card label{color:var(--muted);font-size:13px;font-weight:700}.role-card input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px}.role-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.progress-layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:16px}.role-tabs{display:grid;align-content:start;gap:10px}.role-tab{width:100%;padding:12px;border:1px solid var(--line);border-radius:8px;background:#f8faf8;text-align:left}.role-tab.is-active{border-color:var(--green);background:#edf7ef}.task-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:18px}.progress-ring{display:grid;place-items:center;width:70px;height:70px;border:8px solid #d9eadd;border-top-color:var(--green);border-radius:50%;color:var(--green-dark);font-weight:850}.task-list{display:grid;gap:12px}.task-item{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:14px;border:1px solid var(--line);border-radius:8px;background:#fbfcfb}.task-item input{width:18px;height:18px;margin-top:3px}.task-item strong{display:block;margin-bottom:4px}.task-item p{margin:0;color:var(--muted);line-height:1.5}.source-box,.ai-note{margin-top:16px;padding:16px;border-radius:8px;line-height:1.55}.source-box{border:1px solid #d6e1ef;background:#f2f7ff}.ai-note{border:1px solid #ead8bd;color:#6d4614;background:#fff8ed}@media(max-width:920px){.app-shell{grid-template-columns:1fr}.sidebar{min-height:auto}.grid,.roles-grid,.progress-layout,.deliverables{grid-template-columns:1fr}.topbar,.role-toolbar,.task-head{align-items:flex-start;flex-direction:column}}
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:8px}.field label{font-weight:750}.link-input,.edit-input,.mini-textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:8px;color:#253029;background:#fbfcfb}.mini-textarea{min-height:74px}.link-preview{display:grid;gap:8px;margin-top:12px;color:var(--muted);font-size:14px}.summary-stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.stat{padding:14px;border:1px solid var(--line);border-radius:8px;background:#f8faf8}.stat strong{display:block;font-size:24px;color:var(--green-dark)}.role-output{padding:12px;border:1px solid #d6e1ef;border-radius:8px;background:#f2f7ff;color:#24415f}.task-edit{display:grid;gap:8px}.task-edit label{color:var(--muted);font-size:13px;font-weight:700}@media(max-width:920px){.field-grid,.summary-stat{grid-template-columns:1fr}}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 """
 
 
-def call_ai_api(git_link, lab_link, doc_content):
-    api_key = os.environ.get("GEMINI_API_KEY")
-    openai_url = os.environ.get("OPENAI_BASE_URL")
-    
-    if not api_key:
-        return None, "Lỗi: Không tìm thấy biến môi trường GEMINI_API_KEY."
-    
-    prompt = f"""
-Bạn là một trợ lý ảo LABCODE Copilot chuyên nghiệp.
-Nhiệm vụ của bạn là đọc nội dung tài liệu hướng dẫn lab và link git của nhóm để phân tích, tổng hợp và chia việc.
+from html.parser import HTMLParser
 
-Dữ liệu đầu vào:
-Link Git: {git_link}
-Link Lab: {lab_link}
-Nội dung lab:
-{doc_content}
+class TextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.text_parts = []
+        self.ignore_tags = {'script', 'style', 'head', 'meta', 'link'}
+        self.current_tag = []
 
-Dựa vào thông tin trên, hãy trả về kết quả dưới định dạng JSON với cấu trúc CHÍNH XÁC như sau (không thêm markdown code block, chỉ xuất JSON thuần tuý):
-{{
-  "analysis": {{
-    "summary": ["Câu 1", "Câu 2", "Câu 3"],
-    "timeline": ["Bước 1", "Bước 2", "Bước 3"],
-    "deliverables": [
-      ["Tên đầu ra 1", "Mô tả ngắn 1"],
-      ["Tên đầu ra 2", "Mô tả ngắn 2"]
-    ]
-  }},
-  "roles": [
-    {{
-      "id": "pm",
-      "name": "Tên vai trò (VD: Product Lead)",
-      "focus": "Trọng tâm công việc",
-      "tasks": [
-        ["Tên task 1", "Mô tả chi tiết 1"],
-        ["Tên task 2", "Mô tả chi tiết 2"]
-      ],
-      "output": "Đầu ra cần nộp của vai trò này",
-      "source": "Trích dẫn nguồn từ tài liệu",
-      "note": "Ghi chú từ AI cho vai trò này"
-    }}
-  ],
-  "low_confidence": false
-}}
+    def handle_starttag(self, tag, attrs):
+        self.current_tag.append(tag)
 
-Lưu ý:
-- Nếu tài liệu cung cấp thiếu thông tin cơ bản (không có yêu cầu đầu ra, không rõ số lượng thành viên), hãy set "low_confidence": true và giải thích trong "summary" và "roles" (gắn nhãn cần xác minh).
-- Cần tạo ít nhất 2 đến 3 role. Mỗi role có từ 2-3 task.
-"""
-    
-    start_time = time.time()
+    def handle_endtag(self, tag):
+        if self.current_tag and self.current_tag[-1] == tag:
+            self.current_tag.pop()
+
+    def handle_data(self, data):
+        if self.current_tag and self.current_tag[-1] in self.ignore_tags:
+            return
+        text = data.strip()
+        if text:
+            self.text_parts.append(text)
+            
+    def get_text(self):
+        return ' '.join(self.text_parts)
+
+def fetch_url(url):
+    if not url or not url.startswith('http'): return ""
     try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, context=ctx, timeout=5) as response:
+            content_type = response.headers.get('Content-Type', '')
+            html = response.read().decode('utf-8', errors='ignore')
+            if 'text/html' in content_type:
+                parser = TextExtractor()
+                parser.feed(html)
+                return parser.get_text()
+            return html
+    except Exception as e:
+        return f"[Lỗi khi cào dữ liệu từ {url}: {str(e)}]"
+
+def fetch_github_repo_context(repo_url):
+    import json
+    if "github.com" not in repo_url: return ""
+    parts = repo_url.rstrip('/').split('github.com/')
+    if len(parts) < 2: return ""
+    
+    # Lấy chính xác owner/repo để tránh lỗi 404 khi người dùng dán link có thư mục con (VD: tree/main/docs)
+    repo_parts = parts[1].split('/')
+    if len(repo_parts) < 2: return ""
+    repo_path = f"{repo_parts[0]}/{repo_parts[1]}"
+    
+    context = ""
+    try:
+        # 1. Gọi API lấy metadata repo
+        api_url = f"https://api.github.com/repos/{repo_path}"
+        req = urllib.request.Request(api_url, headers={'User-Agent': 'Mozilla/5.0'})
         ctx = ssl.create_default_context()
         ctx.check_hostname = False
         ctx.verify_mode = ssl.CERT_NONE
         
-        with urllib.request.urlopen(req, context=ctx) as response:
-            result = json.loads(response.read().decode('utf-8'))
+        with urllib.request.urlopen(req, context=ctx, timeout=5) as res:
+            meta = json.loads(res.read().decode('utf-8'))
+            default_branch = meta.get('default_branch', 'main')
             
-        elapsed = time.time() - start_time
+        # 2. Lấy toàn bộ cây thư mục (recursive)
+        tree_url = f"https://api.github.com/repos/{repo_path}/git/trees/{default_branch}?recursive=1"
+        req = urllib.request.Request(tree_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, context=ctx, timeout=10) as res:
+            tree_data = json.loads(res.read().decode('utf-8'))
+            
+        # 3. Lọc file ưu tiên
+        valid_exts = ('.md', '.txt', '.py', '.js', '.ts', '.json', '.yml', '.yaml')
+        priority_words = ['readme', 'guide', 'lab', 'codelab', 'spec', 'cp', 'rubric', 'template', 'plan']
         
-        raw_text = result['candidates'][0]['content']['parts'][0]['text']
-        if raw_text.startswith("```json"):
-            raw_text = raw_text[7:]
-        if raw_text.startswith("```"):
-            raw_text = raw_text[3:]
-        if raw_text.endswith("```"):
-            raw_text = raw_text[:-3]
-            
-        parsed_json = json.loads(raw_text.strip())
+        files = []
+        for item in tree_data.get('tree', []):
+            if item.get('type') == 'blob':
+                path = item.get('path', '')
+                path_lower = path.lower()
+                if path_lower.endswith(valid_exts):
+                    is_priority = any(w in path_lower for w in priority_words)
+                    files.append({'path': path, 'priority': is_priority})
+                    
+        # Ưu tiên các file có từ khóa, sau đó ưu tiên file ở thư mục gốc (ít dấu / nhất)
+        files.sort(key=lambda x: (not x['priority'], x['path'].count('/'), x['path']))
+        files_to_fetch = files[:6]
         
-        os.makedirs(os.path.join("eval", "traces"), exist_ok=True)
-        trace_file = os.path.join("eval", "traces", f"trace_{int(time.time())}.json")
-        with open(trace_file, "w", encoding="utf-8") as f:
-            json.dump({
-                "timestamp": datetime.datetime.now().isoformat(),
-                "model": "gemini-1.5-flash",
-                "elapsed_seconds": elapsed,
-                "input_git": git_link,
-                "input_lab": lab_link,
-                "prompt": prompt,
-                "raw_response": result,
-                "parsed": parsed_json
-            }, f, ensure_ascii=False, indent=2)
+        # 4. Tải nội dung file raw (Dùng ThreadPool để tải song song siêu tốc)
+        import concurrent.futures
+        
+        def _fetch_single(f):
+            raw_url = f"https://raw.githubusercontent.com/{repo_path}/{default_branch}/{f['path']}"
+            import time
+            time.sleep(0.2) # Thêm độ trễ nhỏ để tránh bị Github Rate Limit chặn IP
+            content = fetch_url(raw_url)
+            if content and "[Lỗi" not in content:
+                return f"--- File: {f['path']} ---\n{content[:3000]}\n\n"
+            return ""
             
-        return parsed_json, None
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            for res in executor.map(_fetch_single, files_to_fetch):
+                context += res
+                
+        if not context:
+            return fetch_url(repo_url)
+            
+        return context
     except Exception as e:
-        return None, str(e)
+        # Fallback về trang HTML thường nếu bị rate limit hoặc lỗi API
+        return fetch_url(repo_url)
+
+def call_gemini_chat(history):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    openai_url = os.environ.get("OPENAI_BASE_URL")
+    
+    if not api_key:
+        return {"error": "Lỗi: Không tìm thấy GEMINI_API_KEY."}
+    
+    member_count = STATE.get("member_count", "4")
+    system_prompt = """
+Bạn là LABCODE Copilot. Nhiệm vụ của bạn là đọc tài liệu Lab và phân chia công việc.
+Nếu thông tin đầu vào (tài liệu lab) thiếu các thông tin quan trọng (như deadline, đầu ra), hoặc có yêu cầu phi lý (chia trùng lặp, sai quy trình), bạn KHÔNG ĐƯỢC CHIA VIỆC NGAY. 
+Thay vào đó, hãy đặt câu hỏi lại cho người dùng bằng VĂN BẢN THƯỜNG để họ làm rõ.
+
+LƯU Ý VỀ THÀNH VIÊN: Nhóm này ĐÃ CHỐT SỐ LƯỢNG LÀ [MEMBER_COUNT] THÀNH VIÊN. Bạn bắt buộc phải chia công việc thành ĐÚNG [MEMBER_COUNT] Role tương ứng. TUYỆT ĐỐI KHÔNG hỏi lại người dùng về danh sách tên thành viên.
+""".replace("[MEMBER_COUNT]", str(member_count)) + """
+YÊU CẦU ĐẶC BIỆT (CÂN BẰNG KHỐI LƯỢNG):
+1. Đánh giá độ khó của từng task bằng Điểm Nỗ Lực (Story Points) từ 1 đến 5 (1 là rất nhẹ, 5 là cực kỳ nặng).
+2. Tên của mỗi task BẮT BUỘC phải bắt đầu bằng "[X điểm] ", ví dụ: "[3 điểm] Thiết kế UI".
+3. TỔNG SỐ ĐIỂM (Total Points) của mỗi người (Role) phải XẤP XỈ BẰNG NHAU. Ví dụ: Bạn A làm 1 task 4 điểm, thì bạn B phải làm 2 task 2 điểm.
+4. Ở phần "note" của mỗi Role, bắt buộc phải ghi rõ ở đầu dòng: "Tổng khối lượng: X điểm. ".
+5. THỜI HẠN (DEADLINE): Bắt buộc trích xuất các mốc thời gian (Checkpoint) từ tài liệu và gắn vào cuối mô tả của từng task tương ứng. Ví dụ: "(Deadline: 12h ngày 1 - CP1)".
+6. CHÚ Ý LỊCH TRÌNH: Nếu tài liệu có nhiều mốc thời gian cho các Khoá/Lớp khác nhau (ví dụ Khoá 3 và Khoá 4), hãy MẶC ĐỊNH sử dụng lịch trình của "Khoá 3".
+
+QUAN TRỌNG: 
+- Chỉ khi bạn ĐÃ CHẮC CHẮN hiểu rõ toàn bộ yêu cầu, hãy bắt đầu câu trả lời bằng chuỗi [FINAL_PLAN], và NGAY SAU ĐÓ xuất ra DUY NHẤT một khối JSON.
+- NẾU người dùng có yêu cầu CHỈNH SỬA, THÊM BỚT hoặc CẬP NHẬT kế hoạch (thêm file, đổi deadline, v.v.), BẠN BẮT BUỘC PHẢI XUẤT LẠI TOÀN BỘ KHỐI JSON mới chứa nội dung đã cập nhật (bắt đầu bằng [FINAL_PLAN]). TUYỆT ĐỐI KHÔNG CHỈ TRẢ LỜI BẰNG VĂN BẢN THƯỜNG.
+- YÊU CẦU ĐẦU RA (DELIVERABLES): Trong mảng "deliverables" của JSON, BẠN BẮT BUỘC PHẢI liệt kê ĐẦY ĐỦ tất cả các file và thư mục cần nộp theo đúng cấu trúc yêu cầu của bài lab (ví dụ: README.md, spec.md, codebase/, eval/, validation/,...). Không được bỏ sót.
+- PHÂN BỔ ĐẦU RA CHO CÁC ROLE: Tất cả các file/thư mục vừa được liệt kê trong "deliverables" BẮT BUỘC phải được phân bổ HẾT vào trường "output" của các Role tương ứng. Tuyệt đối không được để sót bất kỳ file nào (đặc biệt là README.md) mà không có người chịu trách nhiệm nộp.
+
+Cấu trúc JSON:
+{
+  "analysis": {
+    "summary": ["Câu 1", "Câu 2"],
+    "timeline": ["Bước 1", "Bước 2"],
+    "deliverables": [["Tên", "Mô tả"]]
+  },
+  "roles": [
+    {
+      "id": "pm",
+      "name": "Product Lead",
+      "focus": "Trọng tâm",
+      "tasks": [
+        ["[3 điểm] Task 1", "Mô tả 1. (Deadline: Trước 12h - CP1)"],
+        ["[1 điểm] Task 2", "Mô tả 2. (Deadline: Trước 17h - CP2)"]
+      ],
+      "output": "Đầu ra",
+      "source": "Nguồn",
+      "note": "Tổng khối lượng: 4 điểm. Ghi chú..."
+    }
+  ],
+  "low_confidence": false
+}
+
+LƯU Ý QUAN TRỌNG: Mảng "tasks" có thể có số lượng BẤT KỲ (từ 1 đến 5 task) cho mỗi vai trò. Hãy linh hoạt thay đổi số lượng task (ví dụ: người làm task 5 điểm chỉ cần 1 task, người làm task 2 điểm cần 2-3 task) để TỔNG ĐIỂM của mỗi người là XẤP XỈ NHAU.
+"""
+    messages = [{"role": "system", "content": system_prompt}]
+    for msg in history:
+        messages.append({"role": msg["role"], "content": msg["content"]})
+        
+    try:
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+
+        if api_key.startswith("sk-") and openai_url:
+            url = f"{openai_url.rstrip('/')}/chat/completions"
+            data = {
+                "model": "gemini-2.5-flash",
+                "messages": messages,
+                "temperature": 0.2
+            }
+            req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {api_key}',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            with urllib.request.urlopen(req, context=ctx) as response:
+                result = json.loads(response.read().decode('utf-8'))
+            raw_text = result['choices'][0]['message']['content']
+        else:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+            contents = []
+            for msg in history:
+                role = "user" if msg["role"] == "user" else "model"
+                contents.append({"role": role, "parts": [{"text": msg["content"]}]})
+            data = {
+                "system_instruction": {"parts": [{"text": system_prompt}]},
+                "contents": contents,
+                "generationConfig": {"temperature": 0.2}
+            }
+            req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers={
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            })
+            with urllib.request.urlopen(req, context=ctx) as response:
+                result = json.loads(response.read().decode('utf-8'))
+            raw_text = result['candidates'][0]['content']['parts'][0]['text']
+            
+        return {"text": raw_text}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def active_analysis():
@@ -288,7 +351,7 @@ def active_analysis():
 
 
 def role_by_id(role_id):
-    return next(role for role in ROLES if role["id"] == role_id)
+    return next((role for role in ROLES if role["id"] == role_id), None)
 
 
 def page_title():
@@ -325,45 +388,66 @@ def sidebar():
         <h1>LABCODE Copilot</h1>
         <p class="subtle">Trợ lý phân tích tài liệu LABCODE và điều phối công việc nhóm.</p>
       </div>
-      <nav class="steps" aria-label="Các bước CP2">{''.join(buttons)}</nav>
-      <section class="checkpoint">
-        <p class="eyebrow">CP2 cần show</p>
-        <ul>
-          <li>Flow chính bấm hết được</li>
-          <li>Data giả, chưa cần AI thật</li>
-          <li>Có case thiếu thông tin</li>
-          <li>Prototype chạy bằng Python</li>
-        </ul>
-      </section>
+      <nav class="steps" aria-label="Các bước">{''.join(buttons)}</nav>
     </aside>
     """
 
 
 def render_upload():
+    if STATE.get("upload_status") == "ai_processing":
+        return f"""
+        <div class="panel upload-panel" style="text-align: center; padding: 50px;">
+          <div class="spinner" style="border: 4px solid var(--line); border-top: 4px solid var(--green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+          <h3 style="margin-top: 20px;">Đang gửi tài liệu cho AI phân tích...</h3>
+          <p style="color: var(--muted);">Quá trình này có thể mất vài giây. Vui lòng giữ nguyên trang.</p>
+        </div>
+        """
+    elif STATE.get("upload_status") == "clarify":
+        return f"""
+        <div class="panel upload-panel" style="text-align: center; padding: 50px;">
+          <h3 style="color: #d9534f; margin-bottom: 20px;">⚠️ AI cần làm rõ thông tin</h3>
+          <p style="color: var(--muted); line-height: 1.6;">
+            Tài liệu bạn cung cấp bị thiếu thông tin hoặc chứa yêu cầu chưa rõ ràng.<br>
+            Vui lòng kiểm tra khung Chat bên phải và <strong>trả lời câu hỏi của AI</strong> để tiếp tục lập kế hoạch.
+          </p>
+          <form method="post" style="margin-top: 20px;">
+            <input type="hidden" name="action" value="reset_upload">
+            <button class="ghost">Huỷ và nạp link khác</button>
+          </form>
+        </div>
+        """
+
     return f"""
-    <form method="post" class="panel upload-panel">
-      <div>
-        <p class="eyebrow">Nguồn đầu vào</p>
-        <h3>Nạp link Git và link code lab</h3>
-        <p>CP2 dùng link mẫu để chứng minh flow. Ở CP3, nút phân tích này sẽ gọi AI thật để đọc repo/lab link và lưu trace trong repo.</p>
-      </div>
-      <div class="field-grid">
-        <div class="field">
-          <label for="git_link">Link Git của nhóm</label>
-          <input class="link-input" id="git_link" name="git_link" value="{escape(STATE["git_link"])}" placeholder="https://github.com/..." />
+    <form method="post" class="panel upload-panel" onsubmit="document.getElementById('upload-ui').style.display='none'; document.getElementById('upload-loading').style.display='block';">
+      <div id="upload-ui">
+        <div>
+          <p class="eyebrow">Nguồn đầu vào</p>
+          <h3>Nạp link Git của nhóm</h3>
+          <p>CP2 dùng link mẫu để chứng minh flow. Ở CP3, nút phân tích này sẽ gọi AI thật để đọc repo và lưu trace trong repo.</p>
         </div>
-        <div class="field">
-          <label for="lab_link">Link code/tài liệu LABCODE</label>
-          <input class="link-input" id="lab_link" name="lab_link" value="{escape(STATE["lab_link"])}" placeholder="https://vlearn... hoặc link bài lab" />
+        <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 16px; margin-top: 16px;">
+          <div class="field">
+            <label for="git_link">Link Git của nhóm</label>
+            <input class="link-input" id="git_link" name="git_link" value="{escape(STATE.get("git_link", ""))}" placeholder="https://github.com/..." />
+          </div>
+          <div class="field">
+            <label for="member_count">Số lượng thành viên</label>
+            <input type="number" min="1" max="15" class="link-input" id="member_count" name="member_count" value="{escape(STATE.get("member_count", "4"))}" placeholder="Ví dụ: 4" />
+          </div>
+        </div>
+        <div class="source-box">
+          <p class="eyebrow">AI sẽ phân tích gì?</p>
+          <p>Repo Github để hiểu cấu trúc code, README, mục tiêu và yêu cầu của lab.</p>
+        </div>
+        <div class="actions">
+          <button class="primary" name="action" value="analyze">Phân tích</button>
+          <button class="ghost" name="action" value="load_risky">Thử link thiếu thông tin</button>
         </div>
       </div>
-      <div class="source-box">
-        <p class="eyebrow">AI sẽ phân tích gì?</p>
-        <p>Repo để hiểu cấu trúc code/nơi nộp bài; link LABCODE để lấy mục tiêu, checkpoint, đầu ra, thứ tự làm và phần tài liệu liên quan.</p>
-      </div>
-      <div class="actions">
-        <button class="primary" name="action" value="analyze">Phân tích</button>
-        <button class="ghost" name="action" value="load_risky">Thử link thiếu thông tin</button>
+      <div id="upload-loading" style="display: none; text-align: center; padding: 50px;">
+          <div class="spinner" style="border: 4px solid var(--line); border-top: 4px solid var(--green); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+          <h3 style="margin-top: 20px;">Đang cào dữ liệu từ Github...</h3>
+          <p style="color: var(--muted);">Vui lòng đợi khoảng 10-15 giây để tải mã nguồn. Không tải lại trang!</p>
       </div>
     </form>
     """
@@ -371,11 +455,11 @@ def render_upload():
 
 def render_analysis():
     data = active_analysis()
-    summary = "".join(f"<li>{escape(item)}</li>" for item in data["summary"])
-    timeline = "".join(f"<li>{escape(item)}</li>" for item in data["timeline"])
+    summary = "".join(f"<li>{escape(item)}</li>" for item in data.get("summary", []))
+    timeline = "".join(f"<li>{escape(item)}</li>" for item in data.get("timeline", []))
     deliverables = "".join(
         f'<div class="deliverable"><strong>{escape(title)}</strong><span>{escape(desc)}</span></div>'
-        for title, desc in data["deliverables"]
+        for title, desc in data.get("deliverables", [])
     )
     return f"""
     <section class="grid">
@@ -384,12 +468,11 @@ def render_analysis():
         <h3>Lab này cần làm gì?</h3>
         <div class="summary-stat">
           <div class="stat"><strong>4</strong><span>bước chính trong flow CP2</span></div>
-          <div class="stat"><strong>5</strong><span>vai trò gợi ý cho nhóm</span></div>
+          <div class="stat"><strong>{len(ROLES)}</strong><span>vai trò gợi ý cho nhóm</span></div>
           <div class="stat"><strong>{'Cần hỏi lại' if STATE["low_confidence"] else 'Đủ mock'}</strong><span>mức tin cậy của phân tích</span></div>
         </div>
         <div class="link-preview">
-          <span><strong>Git:</strong> {escape(STATE["git_link"])}</span>
-          <span><strong>Lab:</strong> {escape(STATE["lab_link"])}</span>
+          <span><strong>Git:</strong> {escape(STATE.get("git_link", ""))}</span>
         </div>
       </article>
       <article class="panel">
@@ -415,10 +498,13 @@ def render_analysis():
 
 
 def render_roles():
+    if not ROLES:
+        return "<div class='panel' style='text-align: center; padding: 50px;'><h3 style='color: var(--muted);'>Vui lòng yêu cầu AI phân tích để tạo danh sách công việc.</h3></div>"
+        
     cards = []
     for role in ROLES:
         task_inputs = []
-        for index, task in enumerate(STATE["role_tasks"][role["id"]]):
+        for index, task in enumerate(STATE["role_tasks"].get(role["id"], [])):
             task_inputs.append(
                 f"""
                 <div class="task-edit">
@@ -427,14 +513,14 @@ def render_roles():
                 </div>
                 """
             )
-        member = escape(STATE["members"][role["id"]])
-        output = escape(STATE["role_outputs"][role["id"]])
+        member = escape(STATE["members"].get(role["id"], ""))
+        output = escape(STATE["role_outputs"].get(role["id"], ""))
         cards.append(
             f"""
             <article class="role-card">
               <div>
-                <p class="eyebrow">{escape(role["focus"])}</p>
-                <h3>{escape(role["name"])}</h3>
+                <p class="eyebrow">{escape(role.get("focus", ""))}</p>
+                <h3>{escape(role.get("name", ""))}</h3>
               </div>
               <label for="{role["id"]}-member">Thành viên phụ trách</label>
               <input id="{role["id"]}-member" name="member_{role["id"]}" value="{member}">
@@ -459,59 +545,95 @@ def render_roles():
 
 
 def render_progress():
-    active_role = role_by_id(STATE["active_role"])
+    if not ROLES:
+        return "<div class='panel' style='text-align: center; padding: 50px;'><h3 style='color: var(--muted);'>Vui lòng yêu cầu AI phân tích để tạo danh sách công việc.</h3></div>"
+        
+    active_role = role_by_id(STATE.get("active_role"))
+    if not active_role:
+        active_role = ROLES[0]
+        
     tabs = []
+    total_group_tasks = 0
+    total_group_done = 0
+    
     for role in ROLES:
+        role_task_titles = STATE["role_tasks"].get(role["id"], [])
+        role_done = STATE["done"].get(role["id"], set())
+        
+        role_total = len(role_task_titles)
+        role_done_count = len(role_done)
+        
+        total_group_tasks += role_total
+        total_group_done += role_done_count
+        
+        role_percent = round((role_done_count / role_total) * 100) if role_total else 0
+        
         active = " is-active" if role["id"] == STATE["active_role"] else ""
         tabs.append(
             f"""
             <form method="post">
               <input type="hidden" name="action" value="select_role">
               <input type="hidden" name="role_id" value="{role["id"]}">
-              <button class="role-tab{active}">
-                <strong>{escape(role["name"])}</strong><br>
-                <span>{escape(STATE["members"][role["id"]])}</span>
+              <button class="role-tab{active}" style="position: relative;">
+                <strong>{escape(role.get("name", ""))}</strong>
+                <span style="position: absolute; right: 12px; top: 12px; font-size: 11px; background: {'var(--green)' if role_percent == 100 else '#e9ecef'}; color: {'white' if role_percent == 100 else 'var(--muted)'}; padding: 2px 6px; border-radius: 10px; font-weight: bold;">{role_percent}%</span>
+                <br>
+                <span>{escape(STATE["members"].get(role["id"], ""))}</span>
               </button>
             </form>
             """
         )
+        
+    overall_percent = round((total_group_done / total_group_tasks) * 100) if total_group_tasks else 0
     done = STATE["done"].get(active_role["id"], set())
     task_items = []
-    task_titles = STATE["role_tasks"][active_role["id"]]
+    task_titles = STATE["role_tasks"].get(active_role["id"], [])
     for index, task in enumerate(task_titles):
-        help_text = active_role["tasks"][index][1]
+        help_text = active_role["tasks"][index][1] if index < len(active_role["tasks"]) else ""
         checked = "checked" if str(index) in done else ""
         task_items.append(
             f"""
-            <label class="task-item">
-              <input type="checkbox" name="done" value="{index}" {checked}>
-              <span>
-                <strong>{escape(task)}</strong>
-                <p>{escape(help_text)}</p>
-              </span>
-            </label>
+            <div class="task-item" style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <label style="display: flex; gap: 12px; cursor: pointer; flex: 1;">
+                <input type="checkbox" name="done" value="{index}" {checked}>
+                <span>
+                  <strong>{escape(task)}</strong>
+                  <p>{escape(help_text)}</p>
+                </span>
+              </label>
+              <button type="button" class="ghost" style="padding: 6px 10px; min-height: 30px; font-size: 12px; flex-shrink: 0; color: var(--green);" onclick="requestTaskGuide('{escape(task)}', '{escape(help_text)}')">
+                📖 Hướng dẫn
+              </button>
+            </div>
             """
         )
-    percent = round(len(done) / len(active_role["tasks"]) * 100)
     note = (
         "Cảnh báo AI: Tài liệu đầu vào thiếu căn cứ. Các task hiện tại là khung tạm, cần xác minh checkpoint và đầu ra trước khi làm thật."
         if STATE["low_confidence"]
-        else active_role["note"]
+        else active_role.get("note", "")
     )
-    return f"""
+    base_html = f"""
+    <div style="margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--line);">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <strong style="color: var(--green-dark);">Tiến độ cả nhóm</strong>
+        <strong style="color: var(--green);">{overall_percent}%</strong>
+      </div>
+      <div style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+        <div style="height: 100%; background: var(--green); width: {overall_percent}%; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
     <div class="progress-layout">
       <aside class="panel role-tabs" aria-label="Danh sách vai trò">{''.join(tabs)}</aside>
       <section class="panel">
         <div class="task-head">
           <div>
-            <p class="eyebrow">{escape(active_role["focus"])}</p>
-            <h3>{escape(active_role["name"])} - {escape(STATE["members"][active_role["id"]])}</h3>
+            <p class="eyebrow">{escape(active_role.get("focus", ""))}</p>
+            <h3>{escape(active_role.get("name", ""))} - {escape(STATE["members"].get(active_role["id"], ""))}</h3>
           </div>
-          <div class="progress-ring">{percent}%</div>
         </div>
         <div class="role-output">
           <p class="eyebrow">Output của vai trò</p>
-          <strong>{escape(STATE["role_outputs"][active_role["id"]])}</strong>
+          <strong>{escape(STATE["role_outputs"].get(active_role["id"], ""))}</strong>
         </div>
         <form method="post">
           <input type="hidden" name="action" value="update_progress">
@@ -523,13 +645,286 @@ def render_progress():
         </form>
         <div class="source-box">
           <p class="eyebrow">Phần tài liệu liên quan</p>
-          <p>{escape(active_role["source"])}</p>
+          <p>{escape(active_role.get("source", ""))}</p>
         </div>
         <div class="ai-note">{escape(note)}</div>
       </section>
     </div>
     """
+    
+    import json
+    roles_data = {}
+    for r in ROLES:
+        roles_data[r["id"]] = [t[1] if len(t)>1 else "" for t in r.get("tasks", [])]
+    roles_json = json.dumps(roles_data)
+    done_data = {k: list(v) for k, v in STATE.get("done", {}).items()}
+    done_json = json.dumps(done_data)
+    
+    script = f"""
+    <script>
+    function checkDeadlines() {{
+        const now = new Date();
+        const rolesData = {roles_json};
+        const doneData = {done_json};
+        const activeRoleId = "{active_role["id"]}";
+        
+        let activeRoleOverdue = false;
+        
+        function parseTime(text) {{
+            const match = text.match(/Deadline.*?(\\d{{1,2}})[:h](\\d{{2}})?/i);
+            if (!match) return null;
+            let hours = parseInt(match[1]);
+            let mins = match[2] ? parseInt(match[2]) : 0;
+            let d = new Date();
+            if (text.match(/ngày 2|ngày mai|n2|tomorrow/i)) {{
+                d.setDate(d.getDate() + 1);
+            }} else if (text.match(/ngày 3|n3/i)) {{
+                d.setDate(d.getDate() + 2);
+            }}
+            d.setHours(hours, mins, 0, 0);
+            return d;
+        }}
 
+        document.querySelectorAll('.task-item').forEach(task => {{
+            const checkbox = task.querySelector('input[type="checkbox"]');
+            if (checkbox && checkbox.checked) {{
+                task.style.borderColor = "";
+                task.style.backgroundColor = "";
+                const w = task.querySelector('.overdue-warning');
+                if (w) w.remove();
+                return;
+            }}
+            const text = task.innerText;
+            const deadline = parseTime(text);
+            if (deadline) {{
+                const diffMins = (deadline - now) / 60000;
+                if (diffMins <= 15) {{
+                    task.style.borderColor = "#d9534f";
+                    task.style.backgroundColor = "#fdf2f2";
+                    activeRoleOverdue = true;
+                    let warning = task.querySelector('.overdue-warning');
+                    if (!warning) {{
+                        warning = document.createElement('span');
+                        warning.className = 'overdue-warning';
+                        warning.style.color = '#d9534f';
+                        warning.style.fontSize = '12px';
+                        warning.style.fontWeight = 'bold';
+                        warning.style.marginLeft = '8px';
+                        task.querySelector('p').appendChild(warning);
+                    }}
+                    warning.innerText = (diffMins < 0) ? ' ⚠️ Quá hạn!' : ' ⚠️ Sắp đến hạn!';
+                }} else {{
+                    task.style.borderColor = "";
+                    task.style.backgroundColor = "";
+                    const w = task.querySelector('.overdue-warning');
+                    if (w) w.remove();
+                }}
+            }}
+        }});
+
+        document.querySelectorAll('.role-tab').forEach(tab => {{
+            const roleId = tab.parentElement.querySelector('input[name="role_id"]').value;
+            let isOverdue = false;
+            if (roleId === activeRoleId) {{
+                isOverdue = activeRoleOverdue;
+            }} else {{
+                const tasks = rolesData[roleId] || [];
+                const done = doneData[roleId] || [];
+                for (let i = 0; i < tasks.length; i++) {{
+                    if (done.includes(String(i))) continue;
+                    const d = parseTime(tasks[i]);
+                    if (d && (d - now) / 60000 <= 15) {{
+                        isOverdue = true;
+                        break;
+                    }}
+                }}
+            }}
+            
+            if (isOverdue) {{
+                tab.style.borderColor = "#d9534f";
+                tab.style.backgroundColor = tab.classList.contains("is-active") ? "#fdf2f2" : "#fff5f5";
+                tab.style.color = "#d9534f";
+            }} else {{
+                tab.style.borderColor = "";
+                tab.style.backgroundColor = "";
+                tab.style.color = "";
+            }}
+        }});
+    }}
+    
+    checkDeadlines();
+    setInterval(checkDeadlines, 30000);
+    </script>
+    """
+    
+    return base_html + script
+
+
+def render_persistent_chat():
+    if not STATE.get("git_link"):
+        return "<aside class='chat-sidebar' style='background:#fbfcfb; padding:20px;'><h3 style='color:var(--muted)'>AI Copilot</h3><p style='color:var(--muted); font-size:14px'>Hãy điền Link tài liệu ở bên trái để bắt đầu chat.</p></aside>"
+        
+    history_json = json.dumps(STATE.get("chat_history", []))
+    ctx = f"Git: {STATE.get('git_link', '')}\\nNội dung:\\n{STATE.get('doc', '')}"
+    ctx_json = json.dumps(ctx)
+    
+    return f'''
+    <aside class="chat-sidebar" style="display:flex; flex-direction:column; background:#fff; height:100vh; border-left:1px solid var(--line);">
+      <div style="padding: 20px; border-bottom: 1px solid var(--line); background:#f8faf8;">
+        <h3 style="margin:0; color:var(--green-dark);">AI Copilot</h3>
+        <p style="margin:4px 0 0; font-size:12px; color:var(--muted);">Gõ chat để thay đổi Dashboard</p>
+      </div>
+      
+      <div id="chat-window" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:8px; background:#fbfcfb;">
+      </div>
+      
+      <div style="padding:20px; border-top:1px solid var(--line); background:#fff;">
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="chat-input" class="edit-input" placeholder="Thêm tester, sửa deadline..." style="flex:1; font-size:14px;">
+          <button id="chat-send" class="primary" style="padding:0 14px; min-height: 36px;">Gửi</button>
+        </div>
+      </div>
+      
+      <form id="hidden-chat-form" method="post" style="display:none;">
+        <input type="hidden" name="action" id="chat-action" value="chat_update">
+        <input type="hidden" name="history_json" id="history-input">
+        <input type="hidden" name="ai_json" id="ai-json-input">
+      </form>
+      
+      <script>
+        const chatWindow = document.getElementById("chat-window");
+        const chatInput = document.getElementById("chat-input");
+        const chatSend = document.getElementById("chat-send");
+        const form = document.getElementById("hidden-chat-form");
+        
+        const currentState = {{"upload_status": "{STATE.get('upload_status', 'idle')}"}};
+        let history = {history_json};
+        if(history.length === 0 && currentState.upload_status === "ai_processing") {{
+            history.push({{role: "user", content: "Tôi cần chia việc cho tài liệu Lab:\\n" + {ctx_json}}});
+            setTimeout(() => sendMsgInternal(""), 300);
+        }} else {{
+            renderHistory();
+            setTimeout(() => {{ chatWindow.scrollTop = chatWindow.scrollHeight; }}, 100);
+        }}
+        
+        function renderHistory() {{
+            chatWindow.innerHTML = "";
+            let visible = history.filter(m => !m.content.startsWith("Tôi cần chia việc cho tài liệu Lab:"));
+            visible.forEach(m => {{
+                let text = m.content;
+                if(text.includes("[FINAL_PLAN]")) text = text.split("[FINAL_PLAN]")[0];
+                if(!text.trim()) return;
+                appendMsgUI(m.role, text);
+            }});
+        }}
+        
+        function appendMsgUI(role, text) {{
+            const div = document.createElement("div");
+            div.style.padding = "10px 14px";
+            div.style.borderRadius = "12px";
+            div.style.maxWidth = "85%";
+            div.style.lineHeight = "1.5";
+            div.style.fontSize = "14px";
+            if(role === "user") {{
+                div.style.alignSelf = "flex-end";
+                div.style.background = "#d9efdf";
+                div.style.color = "#17211b";
+                div.innerHTML = "<strong>Bạn:</strong><br>" + text.replace(/\\n/g, "<br>");
+            }} else {{
+                div.style.alignSelf = "flex-start";
+                div.style.background = "#fff";
+                div.style.color = "#24415f";
+                div.style.border = "1px solid #d6e1ef";
+                div.style.boxShadow = "0 2px 8px rgba(0,0,0,0.03)";
+                div.innerHTML = "<strong>AI:</strong><br>" + (window.marked ? marked.parse(text) : text.replace(/\\n/g, "<br>"));
+                
+                // Remove margin from paragraphs inside AI message
+                const paragraphs = div.getElementsByTagName("p");
+                for (let p of paragraphs) p.style.marginTop = "8px", p.style.marginBottom = "8px";
+            }}
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }}
+        
+        async function sendMsgInternal(text) {{
+            if (text) {{
+                history.push({{role: "user", content: text}});
+                appendMsgUI("user", text);
+                chatInput.value = "";
+            }}
+            chatInput.disabled = true; chatSend.disabled = true;
+            
+            const loading = document.createElement("div");
+            loading.id = "loading-msg";
+            loading.style.alignSelf = "flex-start";
+            loading.style.color = "#647067";
+            loading.style.fontSize = "13px";
+            loading.innerText = "AI đang suy nghĩ...";
+            chatWindow.appendChild(loading);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            try {{
+                const res = await fetch("/chat", {{
+                    method: "POST",
+                    headers: {{"Content-Type": "application/json"}},
+                    body: JSON.stringify({{history: history}})
+                }});
+                const data = await res.json();
+                chatWindow.removeChild(document.getElementById("loading-msg"));
+                
+                if (data.error) {{
+                    appendMsgUI("ai", "Lỗi: " + data.error);
+                    chatInput.disabled = false; chatSend.disabled = false; return;
+                }}
+                
+                let aiText = data.text;
+                history.push({{role: "assistant", content: aiText}});
+                
+                if (aiText.includes("[FINAL_PLAN]")) {{
+                    const parts = aiText.split("[FINAL_PLAN]");
+                    if (parts[0].trim()) appendMsgUI("ai", parts[0].trim());
+                    
+                    let jsonStr = parts[1].trim();
+                    if (jsonStr.startsWith("```json")) jsonStr = jsonStr.substring(7);
+                    if (jsonStr.startsWith("```")) jsonStr = jsonStr.substring(3);
+                    if (jsonStr.endsWith("```")) jsonStr = jsonStr.substring(0, jsonStr.length - 3);
+                    
+                    document.getElementById("ai-json-input").value = jsonStr.trim();
+                    document.getElementById("history-input").value = JSON.stringify(history);
+                    document.getElementById("chat-action").value = "chat_update";
+                    form.submit();
+                }} else {{
+                    appendMsgUI("ai", aiText);
+                    await fetch("/chat_save", {{
+                        method: "POST",
+                        headers: {{"Content-Type": "application/json"}},
+                        body: JSON.stringify({{history: history}})
+                    }});
+                    chatInput.disabled = false; chatSend.disabled = false; chatInput.focus();
+                    
+                    if (currentState.step === "upload" && currentState.upload_status === "ai_processing") {{
+                        document.getElementById("chat-action").value = "chat_clarify";
+                        document.getElementById("history-input").value = JSON.stringify(history);
+                        form.submit();
+                    }}
+                }}
+            }} catch(e) {{
+                chatWindow.removeChild(document.getElementById("loading-msg"));
+                appendMsgUI("ai", "Lỗi kết nối.");
+                chatInput.disabled = false; chatSend.disabled = false;
+            }}
+        }}
+        
+        window.requestTaskGuide = function(taskName, taskDesc) {{
+            const prompt = `Bạn có thể hướng dẫn tôi chi tiết từng bước để làm task này không?\\n\\nTask: ${{taskName}}\\nMô tả: ${{taskDesc}}\\n\\nYêu cầu: Hãy chia thành các bước rõ ràng, cung cấp code mẫu nếu cần thiết, và chỉ ra những điểm cần lưu ý.`;
+            sendMsgInternal(prompt);
+        }};
+        
+        chatSend.onclick = () => sendMsgInternal(chatInput.value);
+        chatInput.onkeypress = (e) => {{ if (e.key === 'Enter') sendMsgInternal(chatInput.value); }};
+      </script>
+    </aside>
+    '''
 
 def render_body():
     return {
@@ -554,21 +949,88 @@ def render_page():
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LABCODE Copilot - CP2 Python Mock</title>
-    <style>{STYLE}</style>
+    <style>
+      {STYLE}
+      .markdown-body ul, .markdown-body ol {{ margin: 8px 0; padding-left: 20px; }}
+      .markdown-body pre {{ background: #f6f8fa; padding: 10px; border-radius: 6px; overflow-x: auto; }}
+      .markdown-body code {{ background: #f6f8fa; padding: 2px 4px; border-radius: 4px; }}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      let sidebarOpen = true;
+      let chatOpen = true;
+      let chatWidth = 350;
+      let isResizing = false;
+      
+      function updateGrid() {{
+        const columns = [];
+        if (sidebarOpen) columns.push("250px");
+        columns.push("minmax(0,1fr)");
+        if (chatOpen) {{
+          columns.push("5px");
+          columns.push(chatWidth + "px");
+        }}
+        
+        const shell = document.getElementById('app-shell');
+        if (shell) shell.style.gridTemplateColumns = columns.join(' ');
+        
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) sidebar.style.display = sidebarOpen ? 'flex' : 'none';
+        const resizer = document.getElementById('chat-resizer');
+        if (resizer) resizer.style.display = chatOpen ? 'block' : 'none';
+        const chat = document.querySelector('.chat-sidebar');
+        if (chat) chat.style.display = chatOpen ? 'flex' : 'none';
+      }}
+      function toggleSidebar() {{ sidebarOpen = !sidebarOpen; updateGrid(); }}
+      function toggleChat() {{ chatOpen = !chatOpen; updateGrid(); }}
+      
+      document.addEventListener('DOMContentLoaded', () => {{
+        const resizer = document.getElementById('chat-resizer');
+        if (!resizer) return;
+        resizer.addEventListener('mousedown', (e) => {{
+          isResizing = true;
+          document.body.style.cursor = 'ew-resize';
+          document.body.style.userSelect = 'none';
+        }});
+        window.addEventListener('mousemove', (e) => {{
+          if (!isResizing) return;
+          const newWidth = window.innerWidth - e.clientX;
+          if (newWidth > 250 && newWidth < 800) {{
+            chatWidth = newWidth;
+            updateGrid();
+          }}
+        }});
+        window.addEventListener('mouseup', () => {{
+          if (isResizing) {{
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+          }}
+        }});
+      }});
+    </script>
   </head>
   <body>
-    <main class="app-shell">
+    <main class="app-shell" id="app-shell">
       {sidebar()}
-      <section class="workspace">
+      <section class="workspace" style="border-right: 1px solid var(--line);">
         <header class="topbar">
-          <div>
-            <p class="eyebrow">Prototype Python Mock</p>
-            <h2>{page_title()}</h2>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button class="ghost" onclick="toggleSidebar()" style="padding: 4px 8px; border: none; font-size: 18px;" title="Đóng/Mở thanh công cụ">☰</button>
+            <div>
+              <p class="eyebrow">Prototype Python Mock</p>
+              <h2>{page_title()}</h2>
+            </div>
           </div>
-          <div class="status-pill">{status}</div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="status-pill">{status}</div>
+            <button class="ghost" onclick="toggleChat()" style="padding: 4px 8px; border: none; font-size: 18px;" title="Đóng/Mở Chat AI">💬</button>
+          </div>
         </header>
         {render_body()}
       </section>
+      <div id="chat-resizer" style="cursor: ew-resize; background: transparent; transition: background 0.2s; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.1)'" onmouseout="this.style.background='transparent'"></div>
+      {render_persistent_chat()}
     </main>
   </body>
 </html>"""
@@ -577,14 +1039,44 @@ def render_page():
 def handle_form(fields):
     action = fields.get("action", [""])[0]
     if action == "analyze":
-        STATE["git_link"] = fields.get("git_link", [STATE["git_link"]])[0].strip()
-        STATE["lab_link"] = fields.get("lab_link", [STATE["lab_link"]])[0].strip()
-        parsed_ai, err = call_ai_api(STATE["git_link"], STATE["lab_link"], STATE["doc"])
+        STATE["git_link"] = fields.get("git_link", [STATE.get("git_link", "")] )[0].strip()
+        STATE["member_count"] = fields.get("member_count", [STATE.get("member_count", "4")] )[0].strip()
+        doc_input = fields.get("doc", [STATE.get("doc", "")] )[0].strip()
         
-        if err:
-            STATE["low_confidence"] = True
-            # fallback to mock risky
+        # Kích hoạt Auto-Scraping nếu ô nhập liệu trống hoặc chứa văn bản mặc định
+        if not doc_input or "Buổi LABCODE" in doc_input:
+            if STATE.get("git_link") and STATE.get("git_link") == STATE.get("last_fetched_link") and STATE.get("last_fetched_doc"):
+                STATE["doc"] = STATE["last_fetched_doc"]
+            else:
+                scraped_text = ""
+                if STATE.get("git_link"):
+                    git_text = fetch_github_repo_context(STATE["git_link"])
+                    if git_text:
+                        scraped_text += "--- CẤU TRÚC GITHUB REPOSITORY ---\n" + git_text + "\n\n"
+                        
+                if scraped_text.strip():
+                    STATE["doc"] = scraped_text
+                    STATE["last_fetched_link"] = STATE["git_link"]
+                    STATE["last_fetched_doc"] = scraped_text
+                else:
+                    STATE["doc"] = "Không thể cào dữ liệu tự động từ các link cung cấp. Vui lòng kiểm tra lại link hoặc paste thủ công."
         else:
+            STATE["doc"] = doc_input
+            
+        STATE["chat_history"] = []
+        STATE["step"] = "upload"
+        STATE["upload_status"] = "ai_processing"
+    elif action == "chat_clarify":
+        STATE["chat_history"] = json.loads(fields.get("history_json", ["[]"])[0])
+        STATE["upload_status"] = "clarify"
+    elif action == "reset_upload":
+        STATE["upload_status"] = "idle"
+        STATE["chat_history"] = []
+    elif action == "chat_update":
+        STATE["chat_history"] = json.loads(fields.get("history_json", ["[]"])[0])
+        ai_json_str = fields.get("ai_json", [""])[0]
+        try:
+            parsed_ai = json.loads(ai_json_str)
             global NORMAL_ANALYSIS, RISKY_ANALYSIS, ROLES
             NORMAL_ANALYSIS = parsed_ai.get("analysis", NORMAL_ANALYSIS)
             RISKY_ANALYSIS = NORMAL_ANALYSIS
@@ -597,7 +1089,6 @@ def handle_form(fields):
             STATE["members"] = {role["id"]: role.get("member", "Chưa gán") for role in ROLES}
             STATE["role_tasks"] = {role["id"]: [task[0] if len(task) > 0 else "Task" for task in role.get("tasks", [])] for role in ROLES}
             
-            # Cập nhật tasks vào trong ROLES luôn để giao diện render help_text đúng (tránh list index out of range)
             for role in ROLES:
                 new_tasks = []
                 for t in role.get("tasks", []):
@@ -612,7 +1103,13 @@ def handle_form(fields):
             STATE["role_outputs"] = {role["id"]: role.get("output", "") for role in ROLES}
             STATE["active_role"] = ROLES[0]["id"] if ROLES else "pm"
             STATE["done"] = {}
-        STATE["step"] = "analysis"
+            STATE["step"] = "analysis"
+            STATE["upload_status"] = "idle"
+        except Exception as e:
+            STATE["low_confidence"] = True
+            STATE["doc"] = "Lỗi parse JSON từ AI: " + str(e) + "\\n" + ai_json_str
+            STATE["step"] = "upload"
+            STATE["upload_status"] = "clarify"
     elif action == "load_risky":
         STATE["git_link"] = "https://github.com/nhom-demo/labcode-cp2"
         STATE["lab_link"] = "link lab bị thiếu yêu cầu đầu ra"
@@ -644,12 +1141,15 @@ def handle_form(fields):
         STATE["step"] = "progress"
     elif action == "back_upload":
         STATE["step"] = "upload"
+        STATE["upload_status"] = "idle"
     elif action == "goto":
         target = fields.get("step", [STATE["step"]])[0]
         allowed = [step[0] for step in STEPS]
         current_index = allowed.index(STATE["step"])
         if target in allowed and allowed.index(target) <= current_index:
             STATE["step"] = target
+            if target == "upload":
+                STATE["upload_status"] = "idle"
 
 
 class LabcodeHandler(BaseHTTPRequestHandler):
@@ -657,6 +1157,34 @@ class LabcodeHandler(BaseHTTPRequestHandler):
         self.respond()
 
     def do_POST(self):
+        if self.path == "/chat":
+            length = int(self.headers.get("Content-Length", "0"))
+            body = self.rfile.read(length).decode("utf-8")
+            req = json.loads(body)
+            res = call_gemini_chat(req.get("history", []))
+            try:
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps(res).encode("utf-8"))
+            except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+                pass
+            return
+            
+        if self.path == "/chat_save":
+            length = int(self.headers.get("Content-Length", "0"))
+            body = self.rfile.read(length).decode("utf-8")
+            req = json.loads(body)
+            STATE["chat_history"] = req.get("history", [])
+            try:
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b"{}")
+            except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+                pass
+            return
+            
         length = int(self.headers.get("Content-Length", "0"))
         body = self.rfile.read(length).decode("utf-8")
         handle_form(parse_qs(body))
@@ -664,11 +1192,14 @@ class LabcodeHandler(BaseHTTPRequestHandler):
 
     def respond(self):
         page = render_page().encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(page)))
-        self.end_headers()
-        self.wfile.write(page)
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(page)))
+            self.end_headers()
+            self.wfile.write(page)
+        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
+            pass
 
     def log_message(self, format, *args):
         return
