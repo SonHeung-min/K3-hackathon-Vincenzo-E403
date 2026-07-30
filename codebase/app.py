@@ -196,10 +196,10 @@ STYLE = """
 
 def call_ai_api(git_link, lab_link, doc_content):
     api_key = os.environ.get("GEMINI_API_KEY")
+    openai_url = os.environ.get("OPENAI_BASE_URL")
+    
     if not api_key:
         return None, "Lỗi: Không tìm thấy biến môi trường GEMINI_API_KEY."
-    
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     
     prompt = f"""
 Bạn là một trợ lý ảo LABCODE Copilot chuyên nghiệp.
@@ -242,11 +242,6 @@ Lưu ý:
 - Nếu tài liệu cung cấp thiếu thông tin cơ bản (không có yêu cầu đầu ra, không rõ số lượng thành viên), hãy set "low_confidence": true và giải thích trong "summary" và "roles" (gắn nhãn cần xác minh).
 - Cần tạo ít nhất 2 đến 3 role. Mỗi role có từ 2-3 task.
 """
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}]
-    }
-    
-    req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers={'Content-Type': 'application/json'})
     
     start_time = time.time()
     try:
