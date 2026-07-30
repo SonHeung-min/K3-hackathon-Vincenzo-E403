@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-07-30T17:16:09.944739",
+  "model": "gemini-3.5-flash",
+  "elapsed_seconds": 19.05616068840027,
+  "input_git": "https://github.com/test/repo",
+  "input_lab": "https://test.com/lab",
+  "prompt": "\nBạn là một trợ lý ảo LABCODE Copilot chuyên nghiệp.\nNhiệm vụ của bạn là đọc nội dung tài liệu hướng dẫn lab và link git của nhóm để phân tích, tổng hợp và chia việc cho đúng 4 thành viên nhóm.\n\nDữ liệu đầu vào:\nLink Git: https://github.com/test/repo\nLink Lab: https://test.com/lab\nNội dung lab:\nBài lab yêu cầu xây dựng ứng dụng chatbot AI có 4 chức năng chính: Đăng nhập, Giao diện chat, Lưu lịch sử, và Phân tích cảm xúc.\n\nDựa vào thông tin trên, hãy trả về kết quả dưới định dạng JSON với cấu trúc CHÍNH XÁC như sau (không thêm markdown code block, chỉ xuất JSON thuần tuý):\n{\n  \"analysis\": {\n    \"summary\": [\"Câu 1\", \"Câu 2\", \"Câu 3\"],\n    \"timeline\": [\"Bước 1\", \"Bước 2\", \"Bước 3\"],\n    \"deliverables\": [\n      [\"Tên đầu ra 1\", \"Mô tả ngắn 1\"],\n      [\"Tên đầu ra 2\", \"Mô tả ngắn 2\"]\n    ]\n  },\n  \"roles\": [\n    {\n      \"id\": \"pm\",\n      \"name\": \"Tên vai trò (VD: Product Lead)\",\n      \"focus\": \"Trọng tâm công việc\",\n      \"tasks\": [\n        [\"Tên task 1\", \"Mô tả chi tiết 1\"],\n        [\"Tên task 2\", \"Mô tả chi tiết 2\"]\n      ],\n      \"output\": \"Đầu ra cần nộp của vai trò này\",\n      \"source\": \"Trích dẫn nguồn từ tài liệu\",\n      \"note\": \"Ghi chú từ AI cho vai trò này\"\n    }\n  ],\n  \"low_confidence\": false\n}\n\nLưu ý quan trọng:\n1. Hãy chia việc thành đúng 4 vai trò (roles). Mảng \"roles\" trong JSON trả về bắt buộc phải có CHÍNH XÁC đúng 4 phần tử.\n2. Với mỗi vai trò, các task cần có tên và mô tả rõ ràng.\n3. Trong trường 'tasks', nếu một task có đầu ra trao đổi dữ liệu với vai trò khác, hãy chỉ rõ định dạng Data Contract ở dạng JSON trong phần mô tả của task để tránh đứt gãy logic (ví dụ: \"Đầu ra JSON contract: {'status': string, 'results': list}\").\n4. Nếu tài liệu cung cấp thiếu thông tin cơ bản, hãy set \"low_confidence\": true.\n",
+  "raw_response": {
+    "candidates": [
+      {
+        "content": {
+          "parts": [
+            {
+              "text": "{\n  \"analysis\": {\n    \"summary\": [\n      \"Xây dựng ứng dụng AI Chatbot hoàn chỉnh tích hợp mô hình phân tích cảm xúc tự động.\",\n      \"Triển khai 4 tính năng cốt lõi: Đăng nhập người dùng, Giao diện trò chuyện trực quan, Lưu trữ lịch sử tin nhắn và Phân tích thái độ người dùng.\",\n      \"Phân chia công việc tối ưu cho nhóm 4 thành viên nhằm đảm bảo tính đồng bộ, hạn chế đứt gãy logic dữ liệu giữa các luồng.\"\n    ],\n    \"timeline\": [\n      \"Bước 1: Thiết kế cơ sở dữ liệu, định nghĩa Data Contract giữa các API và dựng khung giao diện cơ bản (Màn hình Login, Khung Chat).\",\n      \"Bước 2: Phát triển hệ thống Authentication (JWT), xây dựng API lưu lịch sử và tích hợp mô hình AI/Sentiment Analysis.\",\n      \"Bước 3: Kết nối Frontend - Backend, thực hiện kiểm thử tích hợp (Integration Test), tối ưu hiệu năng và đẩy mã nguồn hoàn chỉnh lên Git.\"\n    ],\n    \"deliverables\": [\n      [\"Giao diện người dùng (Frontend UI)\", \"Bộ mã nguồn frontend hoàn chỉnh gồm trang Đăng nhập và Giao diện Chat trực quan.\"],\n      [\"Hệ thống Backend & Database API\", \"Cơ sở dữ liệu và hệ thống API xử lý Đăng nhập, lưu/truy xuất Lịch sử chat.\"],\n      [\"Bộ máy AI & Sentiment Analysis\", \"Dịch vụ AI phản hồi tin nhắn chatbot và trả về kết quả phân tích cảm xúc tương ứng.\"]\n    ]\n  },\n  \"roles\": [\n    {\n      \"id\": \"frontend_dev\",\n      \"name\": \"Frontend Developer\",\n      \"focus\": \"Xây dựng giao diện người dùng và tích hợp API hệ thống (Login UI & Chat Interface)\",\n      \"tasks\": [\n        [\n          \"Thiết kế & Lập trình màn hình Đăng nhập\",\n          \"Xây dựng giao diện Đăng nhập, xử lý validation phía client. Đầu ra JSON Contract gửi đi: {\\\"username\\\": \\\"string\\\", \\\"password\\\": \\\"string\\\"}. Nhận về token để lưu vào LocalStorage.\"\n        ],\n        [\n          \"Thiết kế & Lập trình Giao diện Chat trực quan\",\n          \"Xây dựng khung chat hiển thị luồng tin nhắn (User và Bot) cùng nhãn cảm xúc đi kèm. Đầu vào nhận từ API Chat JSON Contract: {\\\"status\\\": \\\"success\\\", \\\"response\\\": {\\\"message_id\\\": \\\"string\\\", \\\"bot_reply\\\": \\\"string\\\", \\\"sentiment\\\": \\\"string\\\"}}\"\n        ]\n      ],\n      \"output\": \"Mã nguồn Frontend (HTML/CSS/JS hoặc React/Vue/Angular) hoàn chỉnh kết nối mượt mà với các API.\",\n      \"source\": \"Yêu cầu chức năng: Đăng nhập, Giao diện chat tại https://test.com/lab\",\n      \"note\": \"Cần chú ý xử lý tốt trạng thái chờ (loading state) khi chờ AI phân tích và phản hồi để tối ưu trải nghiệm người dùng.\"\n    },\n    {\n      \"id\": \"backend_dev\",\n      \"name\": \"Backend Developer\",\n      \"focus\": \"Phát triển hệ thống Authentication, API Gateway và điều phối dữ liệu\",\n      \"tasks\": [\n        [\n          \"Xây dựng API Đăng nhập và xác thực (Auth API)\",\n          \"Thiết lập cơ chế mã hóa mật khẩu và cấp JWT Token cho người dùng khi đăng nhập thành công. Đầu ra JSON Contract phản hồi: {\\\"status\\\": \\\"success\\\", \\\"token\\\": \\\"jwt_token_here\\\", \\\"user_info\\\": {\\\"id\\\": \\\"string\\\", \\\"username\\\": \\\"string\\\"}}\"\n        ],\n        [\n          \"Xây dựng API Gateway / Định tuyến dịch vụ\",\n          \"Nhận yêu cầu gửi tin nhắn từ Frontend, chuyển tiếp dữ liệu đến AI Engineer để phân tích, sau đó chuyển kết quả cho Database Engineer lưu lại trước khi trả về cho Frontend.\"\n        ]\n      ],\n      \"output\": \"Hệ thống Backend API bảo mật và tài liệu đặc tả API (Swagger/Postman).\",\n      \"source\": \"Yêu cầu chức năng: Đăng nhập tại https://test.com/lab và mã nguồn quản lý tại https://github.com/test/repo\",\n      \"note\": \"Cần cấu hình CORS chính xác để Frontend có thể gửi yêu cầu lên Backend một cách an toàn.\"\n    },\n    {\n      \"id\": \"db_engineer\",\n      \"name\": \"Database & History Specialist\",\n      \"focus\": \"Thiết kế Cơ sở dữ liệu và API quản lý Lịch sử trò chuyện\",\n      \"tasks\": [\n        [\n          \"Thiết kế Schema Cơ sở dữ liệu\",\n          \"Xây dựng cấu trúc các bảng gồm Users, ChatHistory (id, user_id, user_message, bot_response, sentiment, timestamp).\"\n        ],\n        [\n          \"Phát triển API Lưu và Truy xuất lịch sử chat\",\n          \"Xây dựng các truy vấn thêm mới tin nhắn và lấy lại lịch sử chat theo user_id. Đầu vào JSON Contract lưu tin nhắn: {\\\"user_id\\\": \\\"string\\\", \\\"user_message\\\": \\\"string\\\", \\\"bot_response\\\": \\\"string\\\", \\\"sentiment\\\": \\\"string\\\"}. Đầu ra JSON Contract danh sách lịch sử: {\\\"history\\\": [{\\\"message_id\\\": \\\"string\\\", \\\"user_message\\\": \\\"string\\\", \\\"bot_response\\\": \\\"string\\\", \\\"sentiment\\\": \\\"string\\\", \\\"timestamp\\\": \\\"string\\\"}]}\"\n        ]\n      ],\n      \"output\": \"Cơ sở dữ liệu hoạt động ổn định kèm theo hệ thống API CRUD lịch sử chat.\",\n      \"source\": \"Yêu cầu chức năng: Lưu lịch sử tại https://test.com/lab\",\n      \"note\": \"Tối ưu hóa chỉ mục (index) theo trường user_id và timestamp để tăng tốc độ truy vấn lịch sử trò chuyện.\"\n    },\n    {\n      \"id\": \"ai_engineer\",\n      \"name\": \"AI & Sentiment Analysis Specialist\",\n      \"focus\": \"Tích hợp Chatbot AI và phát triển dịch vụ Phân tích cảm xúc\",\n      \"tasks\": [\n        [\n          \"Tích hợp API mô hình Chatbot AI\",\n          \"Kết nối và cấu hình mô hình ngôn ngữ (như OpenAI API, Gemini hoặc mô hình cục bộ) để trả lời tin nhắn của người dùng dựa trên ngữ cảnh.\"\n        ],\n        [\n          \"Phát triển Module Phân tích cảm xúc (Sentiment Analysis)\",\n          \"Xây dựng hoặc gọi API mô hình phân tích cảm xúc (Tích cực, Tiêu cực, Trung lập) dựa trên tin nhắn đầu vào của người dùng. Đầu ra JSON Contract: {\\\"sentiment\\\": \\\"positive | negative | neutral\\\", \\\"confidence\\\": float}\"\n        ]\n      ],\n      \"output\": \"Dịch vụ AI xử lý ngôn ngữ và nhận diện cảm xúc tích hợp dưới dạng API nội bộ.\",\n      \"source\": \"Yêu cầu chức năng: Giao diện chat, Phân tích cảm xúc tại https://test.com/lab\",\n      \"note\": \"Nếu sử dụng mô hình AI ngoài, cần thiết lập cơ chế xử lý lỗi (fallback) phòng trường hợp quá tải hoặc hết hạn API key.\"\n    }\n  ],\n  \"low_confidence\": false\n}",
+              "thoughtSignature": "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"
+            }
+          ],
+          "role": "model"
+        },
+        "finishReason": "STOP",
+        "index": 0
+      }
+    ],
+    "usageMetadata": {
+      "promptTokenCount": 577,
+      "candidatesTokenCount": 1611,
+      "totalTokenCount": 4578,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 577
+        }
+      ],
+      "thoughtsTokenCount": 2390,
+      "serviceTier": "standard"
+    },
+    "modelVersion": "gemini-3.5-flash",
+    "responseId": "VyRrasfULOHCvr0P6J6TqQY"
+  },
+  "parsed": {
+    "analysis": {
+      "summary": [
+        "Xây dựng ứng dụng AI Chatbot hoàn chỉnh tích hợp mô hình phân tích cảm xúc tự động.",
+        "Triển khai 4 tính năng cốt lõi: Đăng nhập người dùng, Giao diện trò chuyện trực quan, Lưu trữ lịch sử tin nhắn và Phân tích thái độ người dùng.",
+        "Phân chia công việc tối ưu cho nhóm 4 thành viên nhằm đảm bảo tính đồng bộ, hạn chế đứt gãy logic dữ liệu giữa các luồng."
+      ],
+      "timeline": [
+        "Bước 1: Thiết kế cơ sở dữ liệu, định nghĩa Data Contract giữa các API và dựng khung giao diện cơ bản (Màn hình Login, Khung Chat).",
+        "Bước 2: Phát triển hệ thống Authentication (JWT), xây dựng API lưu lịch sử và tích hợp mô hình AI/Sentiment Analysis.",
+        "Bước 3: Kết nối Frontend - Backend, thực hiện kiểm thử tích hợp (Integration Test), tối ưu hiệu năng và đẩy mã nguồn hoàn chỉnh lên Git."
+      ],
+      "deliverables": [
+        [
+          "Giao diện người dùng (Frontend UI)",
+          "Bộ mã nguồn frontend hoàn chỉnh gồm trang Đăng nhập và Giao diện Chat trực quan."
+        ],
+        [
+          "Hệ thống Backend & Database API",
+          "Cơ sở dữ liệu và hệ thống API xử lý Đăng nhập, lưu/truy xuất Lịch sử chat."
+        ],
+        [
+          "Bộ máy AI & Sentiment Analysis",
+          "Dịch vụ AI phản hồi tin nhắn chatbot và trả về kết quả phân tích cảm xúc tương ứng."
+        ]
+      ]
+    },
+    "roles": [
+      {
+        "id": "frontend_dev",
+        "name": "Frontend Developer",
+        "focus": "Xây dựng giao diện người dùng và tích hợp API hệ thống (Login UI & Chat Interface)",
+        "tasks": [
+          [
+            "Thiết kế & Lập trình màn hình Đăng nhập",
+            "Xây dựng giao diện Đăng nhập, xử lý validation phía client. Đầu ra JSON Contract gửi đi: {\"username\": \"string\", \"password\": \"string\"}. Nhận về token để lưu vào LocalStorage."
+          ],
+          [
+            "Thiết kế & Lập trình Giao diện Chat trực quan",
+            "Xây dựng khung chat hiển thị luồng tin nhắn (User và Bot) cùng nhãn cảm xúc đi kèm. Đầu vào nhận từ API Chat JSON Contract: {\"status\": \"success\", \"response\": {\"message_id\": \"string\", \"bot_reply\": \"string\", \"sentiment\": \"string\"}}"
+          ]
+        ],
+        "output": "Mã nguồn Frontend (HTML/CSS/JS hoặc React/Vue/Angular) hoàn chỉnh kết nối mượt mà với các API.",
+        "source": "Yêu cầu chức năng: Đăng nhập, Giao diện chat tại https://test.com/lab",
+        "note": "Cần chú ý xử lý tốt trạng thái chờ (loading state) khi chờ AI phân tích và phản hồi để tối ưu trải nghiệm người dùng."
+      },
+      {
+        "id": "backend_dev",
+        "name": "Backend Developer",
+        "focus": "Phát triển hệ thống Authentication, API Gateway và điều phối dữ liệu",
+        "tasks": [
+          [
+            "Xây dựng API Đăng nhập và xác thực (Auth API)",
+            "Thiết lập cơ chế mã hóa mật khẩu và cấp JWT Token cho người dùng khi đăng nhập thành công. Đầu ra JSON Contract phản hồi: {\"status\": \"success\", \"token\": \"jwt_token_here\", \"user_info\": {\"id\": \"string\", \"username\": \"string\"}}"
+          ],
+          [
+            "Xây dựng API Gateway / Định tuyến dịch vụ",
+            "Nhận yêu cầu gửi tin nhắn từ Frontend, chuyển tiếp dữ liệu đến AI Engineer để phân tích, sau đó chuyển kết quả cho Database Engineer lưu lại trước khi trả về cho Frontend."
+          ]
+        ],
+        "output": "Hệ thống Backend API bảo mật và tài liệu đặc tả API (Swagger/Postman).",
+        "source": "Yêu cầu chức năng: Đăng nhập tại https://test.com/lab và mã nguồn quản lý tại https://github.com/test/repo",
+        "note": "Cần cấu hình CORS chính xác để Frontend có thể gửi yêu cầu lên Backend một cách an toàn."
+      },
+      {
+        "id": "db_engineer",
+        "name": "Database & History Specialist",
+        "focus": "Thiết kế Cơ sở dữ liệu và API quản lý Lịch sử trò chuyện",
+        "tasks": [
+          [
+            "Thiết kế Schema Cơ sở dữ liệu",
+            "Xây dựng cấu trúc các bảng gồm Users, ChatHistory (id, user_id, user_message, bot_response, sentiment, timestamp)."
+          ],
+          [
+            "Phát triển API Lưu và Truy xuất lịch sử chat",
+            "Xây dựng các truy vấn thêm mới tin nhắn và lấy lại lịch sử chat theo user_id. Đầu vào JSON Contract lưu tin nhắn: {\"user_id\": \"string\", \"user_message\": \"string\", \"bot_response\": \"string\", \"sentiment\": \"string\"}. Đầu ra JSON Contract danh sách lịch sử: {\"history\": [{\"message_id\": \"string\", \"user_message\": \"string\", \"bot_response\": \"string\", \"sentiment\": \"string\", \"timestamp\": \"string\"}]}"
+          ]
+        ],
+        "output": "Cơ sở dữ liệu hoạt động ổn định kèm theo hệ thống API CRUD lịch sử chat.",
+        "source": "Yêu cầu chức năng: Lưu lịch sử tại https://test.com/lab",
+        "note": "Tối ưu hóa chỉ mục (index) theo trường user_id và timestamp để tăng tốc độ truy vấn lịch sử trò chuyện."
+      },
+      {
+        "id": "ai_engineer",
+        "name": "AI & Sentiment Analysis Specialist",
+        "focus": "Tích hợp Chatbot AI và phát triển dịch vụ Phân tích cảm xúc",
+        "tasks": [
+          [
+            "Tích hợp API mô hình Chatbot AI",
+            "Kết nối và cấu hình mô hình ngôn ngữ (như OpenAI API, Gemini hoặc mô hình cục bộ) để trả lời tin nhắn của người dùng dựa trên ngữ cảnh."
+          ],
+          [
+            "Phát triển Module Phân tích cảm xúc (Sentiment Analysis)",
+            "Xây dựng hoặc gọi API mô hình phân tích cảm xúc (Tích cực, Tiêu cực, Trung lập) dựa trên tin nhắn đầu vào của người dùng. Đầu ra JSON Contract: {\"sentiment\": \"positive | negative | neutral\", \"confidence\": float}"
+          ]
+        ],
+        "output": "Dịch vụ AI xử lý ngôn ngữ và nhận diện cảm xúc tích hợp dưới dạng API nội bộ.",
+        "source": "Yêu cầu chức năng: Giao diện chat, Phân tích cảm xúc tại https://test.com/lab",
+        "note": "Nếu sử dụng mô hình AI ngoài, cần thiết lập cơ chế xử lý lỗi (fallback) phòng trường hợp quá tải hoặc hết hạn API key."
+      }
+    ],
+    "low_confidence": false
+  }
+}

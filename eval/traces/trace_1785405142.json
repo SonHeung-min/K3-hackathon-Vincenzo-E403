@@ -1,0 +1,161 @@
+{
+  "timestamp": "2026-07-30T16:52:22.286136",
+  "model": "gemini-3.5-flash",
+  "elapsed_seconds": 18.637097597122192,
+  "input_git": "https://github.com/error-user/private-repo",
+  "input_lab": "https://vlearn.vinuni.edu.vn/labcode",
+  "prompt": "\nBạn là một trợ lý ảo LABCODE Copilot chuyên nghiệp.\nNhiệm vụ của bạn là đọc nội dung tài liệu hướng dẫn lab và link git của nhóm để phân tích, tổng hợp và chia việc cho đúng 5 thành viên nhóm.\n\nDữ liệu đầu vào:\nLink Git: https://github.com/error-user/private-repo\nLink Lab: https://vlearn.vinuni.edu.vn/labcode\nNội dung lab:\nTài liệu bài LAB 04 yêu cầu xây dựng Research Agent và đo đạc thông số.\n\nDựa vào thông tin trên, hãy trả về kết quả dưới định dạng JSON với cấu trúc CHÍNH XÁC như sau (không thêm markdown code block, chỉ xuất JSON thuần tuý):\n{\n  \"analysis\": {\n    \"summary\": [\"Câu 1\", \"Câu 2\", \"Câu 3\"],\n    \"timeline\": [\"Bước 1\", \"Bước 2\", \"Bước 3\"],\n    \"deliverables\": [\n      [\"Tên đầu ra 1\", \"Mô tả ngắn 1\"],\n      [\"Tên đầu ra 2\", \"Mô tả ngắn 2\"]\n    ]\n  },\n  \"roles\": [\n    {\n      \"id\": \"pm\",\n      \"name\": \"Tên vai trò (VD: Product Lead)\",\n      \"focus\": \"Trọng tâm công việc\",\n      \"tasks\": [\n        [\"Tên task 1\", \"Mô tả chi tiết 1\"],\n        [\"Tên task 2\", \"Mô tả chi tiết 2\"]\n      ],\n      \"output\": \"Đầu ra cần nộp của vai trò này\",\n      \"source\": \"Trích dẫn nguồn từ tài liệu\",\n      \"note\": \"Ghi chú từ AI cho vai trò này\"\n    }\n  ],\n  \"low_confidence\": false\n}\n\nLưu ý quan trọng:\n1. Hãy chia việc thành đúng 5 vai trò (roles). Mảng \"roles\" trong JSON trả về bắt buộc phải có CHÍNH XÁC đúng 5 phần tử.\n2. Với mỗi vai trò, các task cần có tên và mô tả rõ ràng.\n3. Trong trường 'tasks', nếu một task có đầu ra trao đổi dữ liệu với vai trò khác, hãy chỉ rõ định dạng Data Contract ở dạng JSON trong phần mô tả của task để tránh đứt gãy logic (ví dụ: \"Đầu ra JSON contract: {'status': string, 'results': list}\").\n4. Nếu tài liệu cung cấp thiếu thông tin cơ bản, hãy set \"low_confidence\": true.\n",
+  "raw_response": {
+    "candidates": [
+      {
+        "content": {
+          "parts": [
+            {
+              "text": "{\n  \"analysis\": {\n    \"summary\": [\n      \"Xây dựng hệ thống AI Research Agent có khả năng tự động tìm kiếm, phân tích và tổng hợp thông tin nghiên cứu từ Internet hoặc các nguồn tài liệu.\",\n      \"Thiết lập hệ thống đo đạc, đánh giá các chỉ số hiệu năng (Latency, Token Cost) và chất lượng câu trả lời (Accuracy, Faithfulness).\",\n      \"Triển khai dự án lên kho lưu trữ chung và viết tài liệu báo cáo kết quả thử nghiệm Lab 04.\"\n    ],\n    \"timeline\": [\n      \"Tuần 1: Thiết kế kiến trúc Agent, định nghĩa các công cụ (Tools) và thiết lập môi trường Git chung.\",\n      \"Tuần 2: Hiện thực hóa core Agent, tích hợp các API tìm kiếm dữ liệu và xây dựng giao diện cơ bản.\",\n      \"Tuần 3: Chạy thực nghiệm đánh giá, đo đạc các thông số hiệu năng, tối ưu hóa prompt và hoàn thiện báo cáo.\"\n    ],\n    \"deliverables\": [\n      [\"Mã nguồn Research Agent\", \"Chứa logic cốt lõi của Agent (ReAct/Planning) tích hợp LLM và các công cụ tìm kiếm.\"],\n      [\"Hệ thống đo đạc thông số\", \"Bộ dữ liệu và kịch bản test tự động dùng để đo lường các chỉ số vận hành và độ chính xác của Agent.\"],\n      [\"Giao diện người dùng & Dashboard\", \"Ứng dụng web cho phép người dùng tương tác với Agent và theo dõi trực quan các biểu đồ thông số đo đạc.\"]\n    ]\n  },\n  \"roles\": [\n    {\n      \"id\": \"pm\",\n      \"name\": \"Project Manager & Integrator\",\n      \"focus\": \"Quản trị dự án, thiết lập luồng làm việc trên Git, tích hợp hệ thống và biên soạn báo cáo tổng hợp.\",\n      \"tasks\": [\n        [\"Thiết lập Git Workflow và Quản lý Repo\", \"Quản lý nhánh, kiểm duyệt Pull Request trên GitHub (https://github.com/error-user/private-repo), đảm bảo mã nguồn của các thành viên không bị xung đột.\"],\n        [\"Tích hợp hệ thống và Biên soạn báo cáo cuối kỳ\", \"Tổng hợp các phần việc từ FE, Core Agent và Eval để tạo thành sản phẩm hoàn chỉnh. Soạn thảo báo cáo Lab 04 mô tả kiến trúc và kết quả đo đạc. Đầu ra JSON contract cho báo cáo tự động: {'project': 'Lab 04 Research Agent', 'status': 'completed', 'integrated_modules': ['agent_core', 'tools', 'ui', 'eval_suite'], 'overall_metrics': {'avg_latency_sec': float, 'avg_accuracy': float}}\"]\n      ],\n      \"output\": \"Repository GitHub hoàn chỉnh và File báo cáo kết quả Lab 04.\",\n      \"source\": \"Tài liệu bài LAB 04 yêu cầu xây dựng Research Agent và đo đạc thông số và Link Git.\",\n      \"note\": \"PM cần giữ vai trò kết nối, đảm bảo các thành viên bàn giao đúng thời hạn để kịp chạy tích hợp cuối cùng.\"\n    },\n    {\n      \"id\": \"agent_dev\",\n      \"name\": \"AI Agent Architect\",\n      \"focus\": \"Thiết kế luồng logic hoạt động, quản lý ngữ cảnh và xây dựng API cốt lõi cho Research Agent.\",\n      \"tasks\": [\n        [\"Thiết kế luồng suy nghĩ ReAct cho Agent\", \"Sử dụng framework LangChain hoặc LlamaIndex để thiết lập tác vụ lập kế hoạch (planning) và gọi công cụ (tool calling) phù hợp dựa trên câu hỏi nghiên cứu.\"],\n        [\"Xây dựng API Endpoint giao tiếp với Frontend\", \"Phát triển FastAPI server để nhận câu hỏi từ giao diện, kích hoạt Agent và trả về câu trả lời cuối cùng cùng luồng suy nghĩ (thought process). Đầu ra JSON contract: {'query': string, 'thought_steps': [{'step': int, 'thought': string, 'tool_used': string}], 'final_answer': string, 'sources_cited': list}\"]\n      ],\n      \"output\": \"Module API Core Agent hoạt động ổn định, sẵn sàng kết nối với Frontend.\",\n      \"source\": \"yêu cầu xây dựng Research Agent\",\n      \"note\": \"Cần cấu hình cẩn thận để tránh Agent bị rơi vào vòng lặp vô hạn (infinite loop) khi gọi các tools.\"\n    },\n    {\n      \"id\": \"data_eng\",\n      \"name\": \"Data & Search Tooling Engineer\",\n      \"focus\": \"Xây dựng các công cụ thu thập dữ liệu (Search, Scraping) và quản lý Vector Database để phục vụ Agent.\",\n      \"tasks\": [\n        [\"Xây dựng Search & Web Scraping Tools\", \"Kết nối với SerpAPI, Tavily hoặc viết module BeautifulSoup/Playwright để cào thông tin bài báo khoa học. Đầu ra JSON contract cho Tool: {'tool_name': 'web_search_tool', 'results': [{'title': string, 'url': string, 'snippet': string, 'content_extracted': string}]}\"],\n        [\"Thiết lập Vector DB cho tài liệu nghiên cứu\", \"Xây dựng cơ chế chunking tài liệu, tạo embeddings và lưu vào ChromaDB hoặc FAISS để hỗ trợ Agent truy xuất thông tin chính xác (RAG).\"]\n      ],\n      \"output\": \"Tập hợp các Python class của Tools được định dạng chuẩn hóa để tích hợp trực tiếp vào Agent.\",\n      \"source\": \"yêu cầu xây dựng Research Agent\",\n      \"note\": \"Cần thiết lập cơ chế xử lý lỗi tốt phòng trường hợp API tìm kiếm hết hạn mức hoặc trang web chặn bot.\"\n    },\n    {\n      \"id\": \"qa_eval\",\n      \"name\": \"Evaluation & Metrics Specialist\",\n      \"focus\": \"Xây dựng bộ kịch bản kiểm thử và đo lường các thông số kỹ thuật cũng như chất lượng câu trả lời.\",\n      \"tasks\": [\n        [\"Xây dựng test suite và đo lường thông số hiệu năng\", \"Thiết lập kịch bản chạy thử nghiệm tự động trên 20+ câu hỏi nghiên cứu mẫu để đo đạc: Latency, Token Usage và Số lần gọi tool. Đầu ra JSON contract: {'test_run_id': string, 'test_cases': [{'question': string, 'latency_sec': float, 'tokens_used': int, 'success_status': boolean}]}\"],\n        [\"Đánh giá chất lượng nội dung bằng framework RAGAS\", \"Sử dụng các chỉ số như Faithfulness (độ trung thực), Answer Relevance (mức độ liên quan) để đánh giá câu trả lời của Agent dựa trên nguồn ngữ cảnh đã cào.\"]\n      ],\n      \"output\": \"Bộ script đánh giá tự động và bộ dữ liệu đo đạc (CSV/JSON) chi tiết phục vụ việc vẽ biểu đồ.\",\n      \"source\": \"đo đạc thông số.\",\n      \"note\": \"Nên sử dụng một tập dữ liệu test tĩnh (ground truth) để việc đo đạc có tính nhất quán và dễ so sánh.\"\n    },\n    {\n      \"id\": \"fe_dev\",\n      \"name\": \"UI/UX & Visualization Developer\",\n      \"focus\": \"Xây dựng giao diện chat tương tác với Research Agent và bảng hiển thị thống kê (Dashboard) các thông số đo đạc.\",\n      \"tasks\": [\n        [\"Xây dựng giao diện Chatbot Nghiên cứu\", \"Tạo giao diện người dùng (sử dụng Streamlit hoặc React) cho phép người dùng nhập yêu cầu, xem tiến trình suy nghĩ của Agent theo thời gian thực.\"],\n        [\"Phát triển Dashboard trực quan hóa chỉ số đo đạc\", \"Biểu diễn trực quan các thông số Latency, Cost, và Quality Metrics nhận được từ file dữ liệu của QA dưới dạng đồ thị cột, đường. Đầu vào mong đợi từ QA JSON contract: {'metrics_summary': [{'timestamp': string, 'latency': float, 'accuracy': float}]}\"]\n      ],\n      \"output\": \"Ứng dụng web hoàn chỉnh tích hợp API của Agent và hiển thị dashboard đo đạc.\",\n      \"source\": \"xây dựng Research Agent và đo đạc thông số.\",\n      \"note\": \"Streamlit là lựa chọn tối ưu nhất cho bài Lab này để nhanh chóng tích hợp cả giao diện chat lẫn biểu đồ phân tích.\"\n    }\n  ],\n  \"low_confidence\": true\n}",
+              "thoughtSignature": "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"
+            }
+          ],
+          "role": "model"
+        },
+        "finishReason": "STOP",
+        "index": 0
+      }
+    ],
+    "usageMetadata": {
+      "promptTokenCount": 572,
+      "candidatesTokenCount": 1840,
+      "totalTokenCount": 4958,
+      "promptTokensDetails": [
+        {
+          "modality": "TEXT",
+          "tokenCount": 572
+        }
+      ],
+      "thoughtsTokenCount": 2546,
+      "serviceTier": "standard"
+    },
+    "modelVersion": "gemini-3.5-flash",
+    "responseId": "xB5ravq6CYTH0-kPuarS8Qg"
+  },
+  "parsed": {
+    "analysis": {
+      "summary": [
+        "Xây dựng hệ thống AI Research Agent có khả năng tự động tìm kiếm, phân tích và tổng hợp thông tin nghiên cứu từ Internet hoặc các nguồn tài liệu.",
+        "Thiết lập hệ thống đo đạc, đánh giá các chỉ số hiệu năng (Latency, Token Cost) và chất lượng câu trả lời (Accuracy, Faithfulness).",
+        "Triển khai dự án lên kho lưu trữ chung và viết tài liệu báo cáo kết quả thử nghiệm Lab 04."
+      ],
+      "timeline": [
+        "Tuần 1: Thiết kế kiến trúc Agent, định nghĩa các công cụ (Tools) và thiết lập môi trường Git chung.",
+        "Tuần 2: Hiện thực hóa core Agent, tích hợp các API tìm kiếm dữ liệu và xây dựng giao diện cơ bản.",
+        "Tuần 3: Chạy thực nghiệm đánh giá, đo đạc các thông số hiệu năng, tối ưu hóa prompt và hoàn thiện báo cáo."
+      ],
+      "deliverables": [
+        [
+          "Mã nguồn Research Agent",
+          "Chứa logic cốt lõi của Agent (ReAct/Planning) tích hợp LLM và các công cụ tìm kiếm."
+        ],
+        [
+          "Hệ thống đo đạc thông số",
+          "Bộ dữ liệu và kịch bản test tự động dùng để đo lường các chỉ số vận hành và độ chính xác của Agent."
+        ],
+        [
+          "Giao diện người dùng & Dashboard",
+          "Ứng dụng web cho phép người dùng tương tác với Agent và theo dõi trực quan các biểu đồ thông số đo đạc."
+        ]
+      ]
+    },
+    "roles": [
+      {
+        "id": "pm",
+        "name": "Project Manager & Integrator",
+        "focus": "Quản trị dự án, thiết lập luồng làm việc trên Git, tích hợp hệ thống và biên soạn báo cáo tổng hợp.",
+        "tasks": [
+          [
+            "Thiết lập Git Workflow và Quản lý Repo",
+            "Quản lý nhánh, kiểm duyệt Pull Request trên GitHub (https://github.com/error-user/private-repo), đảm bảo mã nguồn của các thành viên không bị xung đột."
+          ],
+          [
+            "Tích hợp hệ thống và Biên soạn báo cáo cuối kỳ",
+            "Tổng hợp các phần việc từ FE, Core Agent và Eval để tạo thành sản phẩm hoàn chỉnh. Soạn thảo báo cáo Lab 04 mô tả kiến trúc và kết quả đo đạc. Đầu ra JSON contract cho báo cáo tự động: {'project': 'Lab 04 Research Agent', 'status': 'completed', 'integrated_modules': ['agent_core', 'tools', 'ui', 'eval_suite'], 'overall_metrics': {'avg_latency_sec': float, 'avg_accuracy': float}}"
+          ]
+        ],
+        "output": "Repository GitHub hoàn chỉnh và File báo cáo kết quả Lab 04.",
+        "source": "Tài liệu bài LAB 04 yêu cầu xây dựng Research Agent và đo đạc thông số và Link Git.",
+        "note": "PM cần giữ vai trò kết nối, đảm bảo các thành viên bàn giao đúng thời hạn để kịp chạy tích hợp cuối cùng."
+      },
+      {
+        "id": "agent_dev",
+        "name": "AI Agent Architect",
+        "focus": "Thiết kế luồng logic hoạt động, quản lý ngữ cảnh và xây dựng API cốt lõi cho Research Agent.",
+        "tasks": [
+          [
+            "Thiết kế luồng suy nghĩ ReAct cho Agent",
+            "Sử dụng framework LangChain hoặc LlamaIndex để thiết lập tác vụ lập kế hoạch (planning) và gọi công cụ (tool calling) phù hợp dựa trên câu hỏi nghiên cứu."
+          ],
+          [
+            "Xây dựng API Endpoint giao tiếp với Frontend",
+            "Phát triển FastAPI server để nhận câu hỏi từ giao diện, kích hoạt Agent và trả về câu trả lời cuối cùng cùng luồng suy nghĩ (thought process). Đầu ra JSON contract: {'query': string, 'thought_steps': [{'step': int, 'thought': string, 'tool_used': string}], 'final_answer': string, 'sources_cited': list}"
+          ]
+        ],
+        "output": "Module API Core Agent hoạt động ổn định, sẵn sàng kết nối với Frontend.",
+        "source": "yêu cầu xây dựng Research Agent",
+        "note": "Cần cấu hình cẩn thận để tránh Agent bị rơi vào vòng lặp vô hạn (infinite loop) khi gọi các tools."
+      },
+      {
+        "id": "data_eng",
+        "name": "Data & Search Tooling Engineer",
+        "focus": "Xây dựng các công cụ thu thập dữ liệu (Search, Scraping) và quản lý Vector Database để phục vụ Agent.",
+        "tasks": [
+          [
+            "Xây dựng Search & Web Scraping Tools",
+            "Kết nối với SerpAPI, Tavily hoặc viết module BeautifulSoup/Playwright để cào thông tin bài báo khoa học. Đầu ra JSON contract cho Tool: {'tool_name': 'web_search_tool', 'results': [{'title': string, 'url': string, 'snippet': string, 'content_extracted': string}]}"
+          ],
+          [
+            "Thiết lập Vector DB cho tài liệu nghiên cứu",
+            "Xây dựng cơ chế chunking tài liệu, tạo embeddings và lưu vào ChromaDB hoặc FAISS để hỗ trợ Agent truy xuất thông tin chính xác (RAG)."
+          ]
+        ],
+        "output": "Tập hợp các Python class của Tools được định dạng chuẩn hóa để tích hợp trực tiếp vào Agent.",
+        "source": "yêu cầu xây dựng Research Agent",
+        "note": "Cần thiết lập cơ chế xử lý lỗi tốt phòng trường hợp API tìm kiếm hết hạn mức hoặc trang web chặn bot."
+      },
+      {
+        "id": "qa_eval",
+        "name": "Evaluation & Metrics Specialist",
+        "focus": "Xây dựng bộ kịch bản kiểm thử và đo lường các thông số kỹ thuật cũng như chất lượng câu trả lời.",
+        "tasks": [
+          [
+            "Xây dựng test suite và đo lường thông số hiệu năng",
+            "Thiết lập kịch bản chạy thử nghiệm tự động trên 20+ câu hỏi nghiên cứu mẫu để đo đạc: Latency, Token Usage và Số lần gọi tool. Đầu ra JSON contract: {'test_run_id': string, 'test_cases': [{'question': string, 'latency_sec': float, 'tokens_used': int, 'success_status': boolean}]}"
+          ],
+          [
+            "Đánh giá chất lượng nội dung bằng framework RAGAS",
+            "Sử dụng các chỉ số như Faithfulness (độ trung thực), Answer Relevance (mức độ liên quan) để đánh giá câu trả lời của Agent dựa trên nguồn ngữ cảnh đã cào."
+          ]
+        ],
+        "output": "Bộ script đánh giá tự động và bộ dữ liệu đo đạc (CSV/JSON) chi tiết phục vụ việc vẽ biểu đồ.",
+        "source": "đo đạc thông số.",
+        "note": "Nên sử dụng một tập dữ liệu test tĩnh (ground truth) để việc đo đạc có tính nhất quán và dễ so sánh."
+      },
+      {
+        "id": "fe_dev",
+        "name": "UI/UX & Visualization Developer",
+        "focus": "Xây dựng giao diện chat tương tác với Research Agent và bảng hiển thị thống kê (Dashboard) các thông số đo đạc.",
+        "tasks": [
+          [
+            "Xây dựng giao diện Chatbot Nghiên cứu",
+            "Tạo giao diện người dùng (sử dụng Streamlit hoặc React) cho phép người dùng nhập yêu cầu, xem tiến trình suy nghĩ của Agent theo thời gian thực."
+          ],
+          [
+            "Phát triển Dashboard trực quan hóa chỉ số đo đạc",
+            "Biểu diễn trực quan các thông số Latency, Cost, và Quality Metrics nhận được từ file dữ liệu của QA dưới dạng đồ thị cột, đường. Đầu vào mong đợi từ QA JSON contract: {'metrics_summary': [{'timestamp': string, 'latency': float, 'accuracy': float}]}"
+          ]
+        ],
+        "output": "Ứng dụng web hoàn chỉnh tích hợp API của Agent và hiển thị dashboard đo đạc.",
+        "source": "xây dựng Research Agent và đo đạc thông số.",
+        "note": "Streamlit là lựa chọn tối ưu nhất cho bài Lab này để nhanh chóng tích hợp cả giao diện chat lẫn biểu đồ phân tích."
+      }
+    ],
+    "low_confidence": true
+  }
+}

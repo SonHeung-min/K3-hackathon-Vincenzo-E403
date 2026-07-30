@@ -1,0 +1,28 @@
+{
+  "transcript_id": "health_20260729T122017924051",
+  "version": "v3",
+  "artifact_version": "v3+p25aafe114560+taa4081fc0094",
+  "prompt_hash": "25aafe114560f564107d5256534aeeba484fec46323437d727522d68d008a5b7",
+  "tools_hash": "aa4081fc00943a64da461baf917861a023a5598b7a68e3ebb8c6474b1cc7f99f",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "/home/nhatnm/code/vin-project/lab/DAY04_G36_E403/starter_v0/artifacts/system_prompt.md",
+  "tools": "/home/nhatnm/code/vin-project/lab/DAY04_G36_E403/starter_v0/artifacts/tools.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-07-29T12:26:12",
+  "updated_at": "2026-07-29T12:26:12",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-07-29T12:26:12",
+      "user": "Tôi bị sốt và đau họng",
+      "status": "provider_error",
+      "assistant_text": "Xin lỗi, hiện mình chưa thể phản hồi. Vui lòng thử lại.",
+      "rounds": [],
+      "tool_events": [],
+      "error": "RuntimeError: Missing API key env var: OPENROUTER_API_KEY",
+      "ended_at": "2026-07-29T12:26:12"
+    }
+  ]
+}
