@@ -1,5 +1,16 @@
 # Mini Hackathon AI — Batch 03
 
+##  BẢNG PHÂN VAI 
+
+| Vai trò (Role)                          |   Người đảm nhận  |
+| --- | --- |
+| **CP1**                                 | `Nguyễn Tiến Thành - 2A202601539` |
+| **CP2**                                 | `Giang Minh Phú - 2A202601729` |
+| **CP3**                                 |  `Vũ Hải Nam - 2A202601173`|
+| **CP4**                                 | `Nguyễn Minh Nhật - 2A202601131` |
+| **CP5**                                 |  `Nguyễn Duy Dũng - 2A202601505`|
+| **CP6**                                 |  `Ong Xuân Sơn - 2A202601327`|
+
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
 - Thời lượng: **1,5 ngày** (một ngày build + một buổi demo)
