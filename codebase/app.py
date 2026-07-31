@@ -19,7 +19,7 @@ except ImportError:
     pass
 
 
-DEFAULT_GIT_LINK = "https://github.com/nhom-demo/labcode-cp2"
+DEFAULT_GIT_LINK = "https://github.com/SonHeung-min/K3-hackathon-Vincenzo-E403"
 DEFAULT_LAB_LINK = "https://vlearn.vinuni.edu.vn/labcode/ai-product-hackathon/cp2"
 
 SAMPLE_DOC = """Buổi LABCODE: AI Product Hackathon
@@ -252,7 +252,7 @@ def call_gemini_chat(history):
     
     member_count = STATE.get("member_count", "4")
     system_prompt = """
-Bạn là LABCODE Copilot. Nhiệm vụ của bạn là đọc tài liệu Lab và phân chia công việc.
+Bạn là LABCODE Copilot. Nhiệm vụ của bạn là đọc tài liệu Lab, phân chia công việc, và giúp từng thành viên hiểu phần việc của mình trong bức tranh chung của lab.
 Nếu thông tin đầu vào (tài liệu lab) thiếu các thông tin quan trọng (như deadline, đầu ra), hoặc có yêu cầu phi lý (chia trùng lặp, sai quy trình), bạn KHÔNG ĐƯỢC CHIA VIỆC NGAY. 
 Thay vào đó, hãy đặt câu hỏi lại cho người dùng bằng VĂN BẢN THƯỜNG để họ làm rõ.
 
@@ -265,6 +265,7 @@ YÊU CẦU ĐẶC BIỆT (CÂN BẰNG KHỐI LƯỢNG):
 4. Ở phần "note" của mỗi Role, bắt buộc phải ghi rõ ở đầu dòng: "Tổng khối lượng: X điểm. ".
 5. THỜI HẠN (DEADLINE): Bắt buộc trích xuất các mốc thời gian (Checkpoint) từ tài liệu và gắn vào cuối mô tả của từng task tương ứng. Ví dụ: "(Deadline: 12h ngày 1 - CP1)".
 6. CHÚ Ý LỊCH TRÌNH: Nếu tài liệu có nhiều mốc thời gian cho các Khoá/Lớp khác nhau (ví dụ Khoá 3 và Khoá 4), hãy MẶC ĐỊNH sử dụng lịch trình của "Khoá 3".
+7. HIỂU BỨC TRANH CHUNG: Mô tả của mỗi task phải nêu ngắn task đó phục vụ mục tiêu lab nào, cần input từ role/phần nào, output đưa cho role/phần nào, và người làm cần hiểu tối thiểu gì về phần của teammate để demo/Q&A được.
 
 QUAN TRỌNG: 
 - Chỉ khi bạn ĐÃ CHẮC CHẮN hiểu rõ toàn bộ yêu cầu, hãy bắt đầu câu trả lời bằng chuỗi [FINAL_PLAN], và NGAY SAU ĐÓ xuất ra DUY NHẤT một khối JSON.
@@ -290,7 +291,7 @@ Cấu trúc JSON:
       ],
       "output": "Đầu ra",
       "source": "Nguồn",
-      "note": "Tổng khối lượng: 4 điểm. Ghi chú..."
+      "note": "Tổng khối lượng: 4 điểm. Vai trò này đóng góp gì vào mục tiêu lab; cần hiểu gì về các vai trò còn lại để demo/Q&A."
     }
   ],
   "low_confidence": false
@@ -1116,7 +1117,7 @@ def handle_form(fields):
             STATE["step"] = "upload"
             STATE["upload_status"] = "clarify"
     elif action == "load_risky":
-        STATE["git_link"] = "https://github.com/nhom-demo/labcode-cp2"
+        STATE["git_link"] = "https://github.com/SonHeung-min/K3-hackathon-Vincenzo-E403"
         STATE["lab_link"] = "link lab bị thiếu yêu cầu đầu ra"
         STATE["doc"] = RISKY_DOC
         STATE["low_confidence"] = True
