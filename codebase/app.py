@@ -424,7 +424,6 @@ def render_upload():
         <div>
           <p class="eyebrow">Nguồn đầu vào</p>
           <h3>Nạp link Git của nhóm</h3>
-          <p>CP2 dùng link mẫu để chứng minh flow. Ở CP3, nút phân tích này sẽ gọi AI thật để đọc repo và lưu trace trong repo.</p>
         </div>
         <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 16px; margin-top: 16px;">
           <div class="field">
