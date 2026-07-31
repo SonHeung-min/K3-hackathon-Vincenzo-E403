@@ -4,8 +4,26 @@ import urllib.request
 import time
 import datetime
 import ssl
+import hashlib
 
 def call_ai_api(git_link, lab_link, doc_content, num_members=3):
+    # Calculate cache key
+    cache_input = f"{git_link}||{lab_link}||{doc_content}||{num_members}"
+    cache_key = hashlib.sha256(cache_input.encode('utf-8')).hexdigest()
+    
+    cache_dir = os.path.join("eval", "cache")
+    os.makedirs(cache_dir, exist_ok=True)
+    cache_file = os.path.join(cache_dir, f"ai_cache_{cache_key}.json")
+    
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r", encoding="utf-8") as f:
+                cached_data = json.load(f)
+            print(f"Loaded from cache: {cache_file}")
+            return cached_data, None
+        except Exception as e:
+            print(f"Lỗi đọc cache: {e}")
+
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return None, "Lỗi: Không tìm thấy biến môi trường GEMINI_API_KEY."
@@ -102,6 +120,12 @@ Lưu ý quan trọng:
                 "raw_response": result,
                 "parsed": parsed_json
             }, f, ensure_ascii=False, indent=2)
+        # Save to cache
+        try:
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump(parsed_json, f, ensure_ascii=False, indent=2)
+        except Exception as cache_err:
+            print(f"Lỗi ghi cache: {cache_err}")
             
         return parsed_json, None
     except Exception as e:
