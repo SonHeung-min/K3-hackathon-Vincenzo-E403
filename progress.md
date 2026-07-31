@@ -17,6 +17,7 @@ Tài liệu này ghi nhận tiến độ thực tế qua các Checkpoint của d
   - [x] Kết nối thành công AI Gemini (`gemini-3.5-flash`) thông qua REST API.
   - [x] Hỗ trợ truyền tham số `num_members` để AI sinh ra CHÍNH XÁC đúng số lượng vai trò mong muốn.
   - [x] Tạo giao kèo dữ liệu (Data Contract) định dạng JSON cụ thể giữa các task có sự trao đổi thông tin.
+  - [x] Tích hợp cơ chế cache kết quả AI dựa trên SHA-256 mã băm để tiết kiệm quota và tăng tốc độ xử lý tức thì (0ms).
 - [x] **Lưu vết và Trace Log (Yêu cầu CP3)**:
   - [x] Tự động ghi lại các trace log chi tiết (thời gian chạy, prompt đầu vào, JSON thô từ API, kết quả parse) vào thư mục `eval/traces/` mỗi khi có lượt gọi AI thành công để phục vụ đo đạc ban đầu.
 - [x] **Tái cấu trúc mã nguồn (Refactoring)**:

@@ -55,3 +55,8 @@ PORT=8015 python3 starter_v0/app.py
 *   **Chi tiết quyết định**: Nếu link GitHub bị lỗi (ví dụ: Private repo không có quyền truy cập, link nhập sai định dạng), ứng dụng hiển thị một thông báo cảnh báo nhẹ nhàng trên màn hình (Soft warning) và mở rộng thêm một khung Textarea dự phòng (`show_fallback = True`) để người dùng có thể chủ động dán trực tiếp đề bài lab bằng tay.
 *   **Tại sao chọn?**:
     *   **Trải nghiệm người dùng tốt hơn (Graceful Failure)**: Tránh làm sập ứng dụng (hard crash). Giúp người dùng luôn có phương án dự phòng để hoàn thành công việc chia task ngay cả khi kết nối mạng hoặc API GitHub gặp sự cố.
+
+### Quyết định 5: Cơ chế Cache kết quả phân tích AI (AI Analysis Caching)
+*   **Chi tiết quyết định**: Tích hợp cơ chế cache file JSON cục bộ (`eval/cache/ai_cache_[hash].json`) dựa trên mã băm SHA-256 của các tham số đầu vào (`git_link`, `lab_link`, `doc_content`, `num_members`).
+*   **Tại sao chọn?**:
+    *   **Tiết kiệm quota & Tăng tốc độ**: Gemini API mất từ 5-10 giây cho mỗi lượt xử lý. Nếu người dùng F5 hoặc chạy lại cùng một yêu cầu, hệ thống sẽ đọc trực tiếp từ cache file trong chưa đầy 1ms. Điều này giúp tối ưu hóa chi phí API, tăng trải nghiệm người dùng và tăng tốc độ chạy các ca kiểm thử tự động.
