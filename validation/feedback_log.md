@@ -3,6 +3,9 @@
 Sản phẩm test: LABCODE Copilot  
 Ngày test: 31/07/2026  
 Mục tiêu test: kiểm tra prototype có giúp học viên hiểu mục tiêu lab, task của mình, phần của teammate, và các đầu ra cần nộp hay không.
+Số người test: 5  
+Tất cả người test: ngoài nhóm  
+Willing user từ CP1: Trần Thị Kiều Oanh, Lê Thị Thúy, Phí Đình Hoàng Anh, Ngô Đình Khánh  
 
 ## Kịch bản test chung
 
@@ -17,6 +20,8 @@ Người test được yêu cầu:
 ## Người test 1 - Trần Thị Kiều Oanh
 
 - Vai trò: Học viên AI Thực Chiến
+- Ngoài nhóm: Có
+- Willing user từ CP1: Có
 - Task test: Xem role Product/Spec và kiểm tra output cần nộp.
 - Quan sát: Người test hiểu nhanh các đầu ra chính, nhưng cần citation rõ hơn cho từng deadline.
 - Quote nguyên văn: "Mình biết phải làm phần nào nhanh hơn, nhưng deadline nên hiện sát từng task hơn chứ không chỉ nằm trong timeline."
@@ -26,6 +31,8 @@ Người test được yêu cầu:
 ## Người test 2 - Nguyễn Thế Khải
 
 - Vai trò: Học viên AI Thực Chiến
+- Ngoài nhóm: Có
+- Willing user từ CP1: Không
 - Task test: Xem role Builder và hỏi phần Eval liên quan gì tới demo.
 - Quan sát: Người test thích phần chia role, nhưng nói nếu chỉ có task list thì vẫn chưa hiểu phần của người khác.
 - Quote nguyên văn: "Nếu nó nói thêm task này phụ thuộc vào ai và output đưa cho ai thì dễ phối hợp hơn."
@@ -35,6 +42,8 @@ Người test được yêu cầu:
 ## Người test 3 - Lê Thị Thúy
 
 - Vai trò: Học viên AI Thực Chiến
+- Ngoài nhóm: Có
+- Willing user từ CP1: Có
 - Task test: Xem role Prompt/Eval và kiểm tra phần golden set.
 - Quan sát: Người test hiểu cần làm golden set, nhưng chưa rõ golden set ảnh hưởng gì tới phần demo.
 - Quote nguyên văn: "Mình làm eval thì hiểu việc của mình, nhưng cần một câu giải thích vì sao demo cần số này."
@@ -44,6 +53,8 @@ Người test được yêu cầu:
 ## Người test 4 - Phí Đình Hoàng Anh
 
 - Vai trò: Học viên AI Thực Chiến
+- Ngoài nhóm: Có
+- Willing user từ CP1: Có
 - Task test: Dùng chat để yêu cầu sửa deadline và thêm role Tester.
 - Quan sát: Chat sửa được kế hoạch, nhưng người test cần biết thay đổi đó ảnh hưởng role nào.
 - Quote nguyên văn: "Sửa deadline được là ổn, nhưng sau khi sửa nên thấy ai bị ảnh hưởng."
@@ -53,6 +64,8 @@ Người test được yêu cầu:
 ## Người test 5 - Ngô Đình Khánh
 
 - Vai trò: Học viên AI Thực Chiến
+- Ngoài nhóm: Có
+- Willing user từ CP1: Có
 - Task test: Thử case tài liệu thiếu đầu ra.
 - Quan sát: Prototype báo cần hỏi lại thay vì bịa output. Người test đánh giá đây là hành vi cần thiết.
 - Quote nguyên văn: "Thiếu yêu cầu nộp mà nó hỏi lại thì tốt hơn là tự đoán, vì sai output là mất điểm."
