@@ -775,7 +775,7 @@ def render_persistent_chat():
         <p style="margin:4px 0 0; font-size:12px; color:var(--muted);">Gõ chat để thay đổi Dashboard</p>
       </div>
       
-      <div id="chat-window" style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:8px; background:#fbfcfb;">
+      <div id="chat-window" style="flex:1; overflow-y:auto; overflow-x:hidden; padding:20px; display:flex; flex-direction:column; gap:8px; background:#fbfcfb;">
       </div>
       
       <div style="padding:20px; border-top:1px solid var(--line); background:#fff;">
@@ -825,16 +825,20 @@ def render_persistent_chat():
         
         function appendMsgUI(role, text) {{
             const div = document.createElement("div");
+            div.className = "chat-message markdown-body";
             div.style.padding = "10px 14px";
             div.style.borderRadius = "12px";
             div.style.maxWidth = "85%";
+            div.style.minWidth = "0";
+            div.style.overflowWrap = "anywhere";
+            div.style.wordBreak = "break-word";
             div.style.lineHeight = "1.5";
             div.style.fontSize = "14px";
             if(role === "user") {{
                 div.style.alignSelf = "flex-end";
                 div.style.background = "#d9efdf";
                 div.style.color = "#17211b";
-                div.innerHTML = "<strong>Bạn:</strong><br>" + text.replace(/\\n/g, "<br>");
+                div.innerHTML = "<strong>Bạn:</strong><br>" + escapeHtml(text).replace(/\\n/g, "<br>");
             }} else {{
                 div.style.alignSelf = "flex-start";
                 div.style.background = "#fff";
@@ -849,6 +853,15 @@ def render_persistent_chat():
             }}
             chatWindow.appendChild(div);
             chatWindow.scrollTop = chatWindow.scrollHeight;
+        }}
+
+        function escapeHtml(text) {{
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }}
         
         async function sendMsgInternal(text) {{
@@ -956,9 +969,15 @@ def render_page():
     <title>LABCODE Copilot - CP2 Python Mock</title>
     <style>
       {STYLE}
+      .chat-sidebar {{ min-width: 0; overflow: hidden; }}
+      .chat-message {{ width: fit-content; max-width: calc(100% - 12px); }}
+      .markdown-body, .markdown-body * {{ overflow-wrap: anywhere; word-break: break-word; }}
+      .markdown-body p {{ margin: 8px 0; }}
       .markdown-body ul, .markdown-body ol {{ margin: 8px 0; padding-left: 20px; }}
-      .markdown-body pre {{ background: #f6f8fa; padding: 10px; border-radius: 6px; overflow-x: auto; }}
-      .markdown-body code {{ background: #f6f8fa; padding: 2px 4px; border-radius: 4px; }}
+      .markdown-body li {{ margin: 4px 0; padding-left: 2px; }}
+      .markdown-body pre {{ max-width: 100%; white-space: pre-wrap; background: #f6f8fa; padding: 10px; border-radius: 6px; overflow-x: hidden; }}
+      .markdown-body code {{ white-space: break-spaces; background: #f6f8fa; padding: 2px 4px; border-radius: 4px; }}
+      .markdown-body table {{ display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
